@@ -9,6 +9,7 @@ import { QuoteGenerator } from './components/QuoteGenerator';
 import { UnifiedCommunication } from './components/UnifiedCommunication';
 import { supabase } from './lib/supabase';
 import { WelcomeSplash } from './components/WelcomeSplash';
+import { AuthCallback } from './pages/AuthCallback';
 
 interface UploadedFile {
   name: string;
@@ -127,6 +128,10 @@ export default function App() {
   const handleFileUpdate = async () => {
     setTimeout(loadUserFiles, 500);
   };
+
+  if (window.location.pathname === '/auth/callback') {
+    return <AuthCallback />;
+  }
 
   return (
     <div className="min-h-screen bg-black">
