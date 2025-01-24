@@ -337,3 +337,47 @@ body {
   transform: scale(0.98) translateY(10px);
   transition: all 0.2s ease-in;
 }
+
+/* Add these to your existing styles */
+.unified-page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.unified-page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease-out;
+}
+
+.unified-page-exit {
+  opacity: 1;
+}
+
+.unified-page-exit-active {
+  opacity: 0;
+  transition: opacity 0.2s ease-in;
+}
+
+/* Split view styles */
+.split-handle {
+  @apply absolute h-full w-1 cursor-col-resize transition-colors duration-200;
+  touch-action: none;
+}
+
+.split-handle:hover::after,
+.split-handle.dragging::after {
+  @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
+    w-1 h-24 bg-sky-500/20 rounded-full;
+  content: '';
+}
+
+/* Prevent text selection while dragging */
+.dragging-splitter {
+  @apply select-none;
+}
+
+/* Add smooth transitions for split sections */
+.split-section {
+  @apply transition-all duration-75 ease-out;
+}

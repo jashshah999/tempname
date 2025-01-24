@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, MessageSquare, FileSpreadsheet, Settings, X, Plus, LogOut, Reply, ArrowLeft, Send, Loader, RefreshCw, Download, Paperclip, Image, FileText, File, ZoomIn, ZoomOut } from 'lucide-react';
+import { Mail, MessageSquare, FileSpreadsheet, Settings, X, Plus, LogOut, Reply, ArrowLeft, Send, Loader, RefreshCw, Download, Paperclip, Image, FileText, File, ZoomIn, ZoomOut, Workflow } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import DOMPurify from 'dompurify';
 
@@ -111,6 +111,8 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
   });
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [splitPosition, setSplitPosition] = useState(50); // Percentage
+  const [isDragging, setIsDragging] = useState(false);
 
   // Check if user is already authenticated with Google
   useEffect(() => {
@@ -898,125 +900,156 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
     return doc.body.innerHTML;
   };
 
+  // Add these handlers
+  const handleDragStart = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    e.preventDefault(); // Prevent text selection while dragging
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrag = (e: MouseEvent) => {
+    if (!isDragging) return;
+    
+    const container = document.getElementById('split-container');
+    if (!container) return;
+    
+    const containerRect = container.getBoundingClientRect();
+    const containerWidth = containerRect.width;
+    const mouseX = e.clientX - containerRect.left;
+    
+    // Calculate percentage (constrain between 20% and 80%)
+    const newPosition = Math.min(Math.max((mouseX / containerWidth) * 100, 20), 80);
+    setSplitPosition(newPosition);
+  };
+
+  // Add event listeners
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleDrag);
+      window.addEventListener('mouseup', handleDragEnd);
+    }
+    
+    return () => {
+      window.removeEventListener('mousemove', handleDrag);
+      window.removeEventListener('mouseup', handleDragEnd);
+    };
+  }, [isDragging]);
+
   return (
-    <>
-      <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div className="glass-card w-full max-w-6xl h-[90vh] p-4 relative">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-white">Unified Communication</h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-white">
+    <div className="min-h-screen bg-black">
+      {/* Top Navigation Bar */}
+      <div className="bg-gray-900/50 border-b border-sky-500/20 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="logo-icon">
+              <Workflow className="h-6 w-6" />
+            </div>
+            <span className="text-lg font-bold text-white">MSME Flow</span>
+          </div>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut();
+              }}
+              className="btn-secondary flex items-center space-x-2"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Sign Out</span>
+            </button>
+            <button 
+              onClick={onClose}
+              className="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800/50"
+            >
               <X className="h-5 w-5" />
             </button>
           </div>
+        </div>
+      </div>
 
-          {/* Main Content */}
-          <div className="flex h-[calc(100%-4rem)]">
-            {/* Sidebar */}
-            <div className="w-64 border-r border-sky-500/20 pr-4">
-              <div className="space-y-2">
-                <button
-                  onClick={() => setActiveTab('email')}
-                  className={`w-full text-left p-3 rounded-lg flex items-center space-x-3 ${
-                    activeTab === 'email' ? 'bg-sky-500/10 text-sky-500' : 'hover:bg-sky-500/5'
-                  }`}
-                >
-                  <Mail className="h-16 w-16 text-sky-500/50 mb-4" />
-                  <span>Email</span>
-                  {!isConfigured.email && (
-                    <span className="ml-auto text-xs text-sky-500">Setup Required</span>
-                  )}
-                </button>
-                
-                <button
-                  onClick={() => setActiveTab('whatsapp')}
-                  className={`w-full text-left p-3 rounded-lg flex items-center space-x-3 ${
-                    activeTab === 'whatsapp' ? 'bg-sky-500/10 text-sky-500' : 'hover:bg-sky-500/5'
-                  }`}
-                >
-                  <MessageSquare className="h-16 w-16 text-sky-500/50 mb-4" />
-                  <span>WhatsApp</span>
-                  {!isConfigured.whatsapp && (
-                    <span className="ml-auto text-xs text-sky-500">Setup Required</span>
-                  )}
-                </button>
-                
-                <button
-                  onClick={() => setActiveTab('sheets')}
-                  className={`w-full text-left p-3 rounded-lg flex items-center space-x-3 ${
-                    activeTab === 'sheets' ? 'bg-sky-500/10 text-sky-500' : 'hover:bg-sky-500/5'
-                  }`}
-                >
-                  <FileSpreadsheet className="h-16 w-16 text-sky-500/50 mb-4" />
-                  <span>Sheets</span>
-                  {!isConfigured.sheets && (
-                    <span className="ml-auto text-xs text-sky-500">Setup Required</span>
-                  )}
+      {/* Split View Container */}
+      <div 
+        id="split-container"
+        className="h-[calc(100vh-4rem)] flex relative"
+        style={{ cursor: isDragging ? 'col-resize' : 'auto' }}
+      >
+        {/* Email Section */}
+        <div 
+          className="h-full border-r border-sky-500/20 overflow-hidden"
+          style={{ width: `${splitPosition}%` }}
+        >
+          <div className="h-full">
+            {!isConfigured.email ? (
+              <div className="flex flex-col items-center justify-center h-full">
+                <Mail className="h-16 w-16 text-sky-500/50 mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">Connect Gmail Account</h3>
+                <p className="text-gray-400 mb-4 text-center max-w-md">
+                  Connect your Gmail account to send and receive emails directly.
+                </p>
+                <button onClick={handleGmailAuth} className="btn-primary">
+                  Connect Gmail
                 </button>
               </div>
+            ) : (
+              <div className="h-full">
+                {renderEmailInterface()}
+              </div>
+            )}
+          </div>
+        </div>
 
-              {/* Settings */}
-              <div className="absolute bottom-4 left-4 w-56">
-                <button className="w-full btn-secondary flex items-center justify-center space-x-2">
-                  <Settings className="h-4 w-4" />
-                  <span>Settings</span>
+        {/* Draggable Divider */}
+        <div
+          className="absolute h-full w-1 cursor-col-resize group"
+          style={{ 
+            left: `${splitPosition}%`,
+            transform: 'translateX(-50%)',
+          }}
+          onMouseDown={handleDragStart}
+        >
+          <div className={`
+            absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+            w-4 h-24 rounded-full bg-sky-500/10 opacity-0 
+            group-hover:opacity-100 transition-opacity
+            ${isDragging ? 'opacity-100' : ''}
+          `}>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-0.5 h-12 bg-sky-500/50 rounded-full" />
+            </div>
+          </div>
+        </div>
+
+        {/* WhatsApp Section */}
+        <div 
+          className="h-full overflow-hidden"
+          style={{ width: `${100 - splitPosition}%` }}
+        >
+          <div className="h-full">
+            {!isConfigured.whatsapp ? (
+              <div className="flex flex-col items-center justify-center h-full">
+                <MessageSquare className="h-16 w-16 text-sky-500/50 mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">Connect WhatsApp</h3>
+                <p className="text-gray-400 mb-4 text-center max-w-md">
+                  Link your WhatsApp account to send and receive messages directly.
+                </p>
+                <button onClick={handleWhatsAppAuth} className="btn-primary">
+                  Connect WhatsApp
                 </button>
               </div>
-            </div>
-
-            {/* Content Area */}
-            <div className="flex-1 pl-4 overflow-hidden">
-              {/* Email Tab */}
-              {activeTab === 'email' && (
-                <div className="h-full">
-                  {renderEmailInterface()}
+            ) : (
+              <div className="h-full p-4">
+                {/* WhatsApp interface will go here */}
+                <div className="bg-gray-900/50 rounded-lg h-full p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-white">WhatsApp Messages</h2>
+                    <span className="text-sm text-gray-400">Connected</span>
+                  </div>
+                  {/* WhatsApp content will go here */}
                 </div>
-              )}
-
-              {/* WhatsApp Tab */}
-              {activeTab === 'whatsapp' && (
-                <div className="h-full">
-                  {!isConfigured.whatsapp ? (
-                    <div className="flex flex-col items-center justify-center h-full">
-                      <MessageSquare className="h-16 w-16 text-sky-500/50 mb-4" />
-                      <h3 className="text-xl font-bold text-white mb-2">Connect WhatsApp</h3>
-                      <p className="text-gray-400 mb-4 text-center max-w-md">
-                        Link your WhatsApp account to send and receive messages from this interface.
-                      </p>
-                      <button onClick={handleWhatsAppAuth} className="btn-primary">
-                        Connect WhatsApp
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="h-full">
-                      {/* WhatsApp interface will go here */}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Sheets Tab */}
-              {activeTab === 'sheets' && (
-                <div className="h-full">
-                  {!isConfigured.sheets ? (
-                    <div className="flex flex-col items-center justify-center h-full">
-                      <FileSpreadsheet className="h-16 w-16 text-sky-500/50 mb-4" />
-                      <h3 className="text-xl font-bold text-white mb-2">Connect Google Sheets</h3>
-                      <p className="text-gray-400 mb-4 text-center max-w-md">
-                        Connect your Google Sheets to view and edit spreadsheets directly.
-                      </p>
-                      <button onClick={handleSheetsAuth} className="btn-primary">
-                        Connect Sheets
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="h-full">
-                      {/* Sheets interface will go here */}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -1028,6 +1061,6 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
           onClose={() => setEmailState(prev => ({ ...prev, selectedImage: null }))}
         />
       )}
-    </>
+    </div>
   );
 }

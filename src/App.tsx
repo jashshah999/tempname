@@ -133,6 +133,10 @@ export default function App() {
     return <AuthCallback />;
   }
 
+  if (showUnifiedComm) {
+    return <UnifiedCommunication onClose={() => setShowUnifiedComm(false)} />;
+  }
+
   return (
     <div className="min-h-screen bg-black">
       {showWelcome && <WelcomeSplash onComplete={() => setShowWelcome(false)} />}
@@ -398,9 +402,6 @@ export default function App() {
             onUpdate={handleFileUpdate}
             data={selectedFile.data}
           />
-        )}
-        {showUnifiedComm && (
-          <UnifiedCommunication onClose={() => setShowUnifiedComm(false)} />
         )}
       </div>
     </div>
