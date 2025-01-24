@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, MessageSquare, FileSpreadsheet, Settings, X } from 'lucide-react';
+import { Mail, MessageSquare, FileSpreadsheet, Settings, X, Plus, LogOut, Reply, ArrowLeft, Send, Loader, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface UnifiedCommunicationProps {
@@ -461,9 +461,10 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
           <div className="flex items-center space-x-4">
             <button 
               onClick={handleComposeNew}
-              className="btn-primary text-sm"
+              className="btn-primary flex items-center space-x-2"
             >
-              Compose
+              <Plus className="h-4 w-4" />
+              <span>Compose</span>
             </button>
             <button 
               onClick={async () => {
@@ -472,8 +473,9 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
                 setUserEmail(null);
                 setEmails([]);
               }}
-              className="text-red-500 hover:text-red-400 text-sm"
+              className="btn-danger"
             >
+              <LogOut className="h-4 w-4 mr-2" />
               Disconnect
             </button>
           </div>
@@ -486,7 +488,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
             placeholder="Search emails..."
             value={emailState.searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            className="w-full px-4 py-2 bg-black/30 border border-sky-500/20 rounded-lg focus:outline-none focus:border-sky-500/50 text-white"
+            className="input-primary"
           />
         </div>
 
@@ -507,7 +509,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
                     ...prev,
                     composing: { ...prev.composing!, to: e.target.value }
                   }))}
-                  className="w-full px-3 py-2 bg-black/30 border border-sky-500/20 rounded text-white"
+                  className="input-primary"
                 />
                 <input
                   type="text"
@@ -517,7 +519,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
                     ...prev,
                     composing: { ...prev.composing!, cc: e.target.value }
                   }))}
-                  className="w-full px-3 py-2 bg-black/30 border border-sky-500/20 rounded text-white"
+                  className="input-primary"
                 />
                 <input
                   type="text"
@@ -527,7 +529,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
                     ...prev,
                     composing: { ...prev.composing!, bcc: e.target.value }
                   }))}
-                  className="w-full px-3 py-2 bg-black/30 border border-sky-500/20 rounded text-white"
+                  className="input-primary"
                 />
                 <input
                   type="text"
@@ -537,7 +539,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
                     ...prev,
                     composing: { ...prev.composing!, subject: e.target.value }
                   }))}
-                  className="w-full px-3 py-2 bg-black/30 border border-sky-500/20 rounded text-white"
+                  className="input-primary"
                 />
                 <textarea
                   placeholder="Message"
@@ -546,7 +548,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
                     ...prev,
                     composing: { ...prev.composing!, body: e.target.value }
                   }))}
-                  className="w-full h-64 px-3 py-2 bg-black/30 border border-sky-500/20 rounded text-white resize-none"
+                  className="input-primary h-64 px-3 py-2 bg-black/30 border border-sky-500/20 rounded text-white resize-none"
                 />
                 <div className="flex justify-end space-x-3">
                   <button
@@ -559,6 +561,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
                     onClick={() => handleSendEmail(emailState.composing)}
                     className="btn-primary"
                   >
+                    <Send className="h-4 w-4 mr-2" />
                     Send
                   </button>
                 </div>
@@ -580,17 +583,19 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
                     </p>
                   </div>
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex space-x-3">
                   <button
                     onClick={() => handleReply(emailState.selectedEmail!)}
-                    className="btn-secondary text-sm"
+                    className="btn-primary"
                   >
+                    <Reply className="h-4 w-4 mr-2" />
                     Reply
                   </button>
                   <button
                     onClick={() => setEmailState(prev => ({ ...prev, view: 'list' }))}
-                    className="btn-secondary text-sm"
+                    className="btn-secondary"
                   >
+                    <ArrowLeft className="h-4 w-4 mr-2" />
                     Back
                   </button>
                 </div>
@@ -627,15 +632,23 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
               ))}
               
               {hasMore && (
-                <div className="p-4 text-center">
-                  <button
-                    onClick={loadMoreEmails}
-                    className="btn-secondary text-sm"
-                    disabled={loading}
-                  >
-                    {loading ? 'Loading...' : 'Load More'}
-                  </button>
-                </div>
+                <button
+                  onClick={loadMoreEmails}
+                  className="btn-secondary w-full"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center">
+                      <Loader className="h-4 w-4 animate-spin mr-2" />
+                      Loading...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Load More
+                    </span>
+                  )}
+                </button>
               )}
             </div>
           )}

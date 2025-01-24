@@ -79,9 +79,9 @@ body {
 }
 
 .glass-card {
-  @apply bg-black/90 backdrop-blur-lg border border-sky-500/20 transition-all duration-300;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  animation: scaleIn 0.5s ease-out;
+  @apply bg-black/40 backdrop-blur-xl 
+    border border-sky-500/20 rounded-xl
+    shadow-xl shadow-black/10;
 }
 
 .glass-card:hover {
@@ -90,24 +90,35 @@ body {
 }
 
 .btn-primary {
-  @apply relative px-6 py-2.5 rounded-lg bg-sky-500 text-white font-medium transition-all duration-200;
-  box-shadow: 0 2px 10px rgba(14, 165, 233, 0.2);
-}
-
-.btn-primary:hover {
-  @apply bg-sky-400;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(14, 165, 233, 0.4);
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg
+    bg-sky-500 text-white font-medium
+    hover:bg-sky-600 
+    focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:ring-offset-2 focus:ring-offset-black
+    disabled:opacity-50 disabled:cursor-not-allowed
+    transition-all duration-200 ease-in-out
+    text-sm;
 }
 
 .btn-secondary {
-  @apply px-5 py-2 rounded-lg font-medium text-sky-500 border border-sky-500/30 transition-all duration-200;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9));
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg
+    bg-transparent text-sky-500 font-medium
+    border border-sky-500/20
+    hover:bg-sky-500/10 hover:border-sky-500/30
+    focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:ring-offset-2 focus:ring-offset-black
+    disabled:opacity-50 disabled:cursor-not-allowed
+    transition-all duration-200 ease-in-out
+    text-sm;
 }
 
-.btn-secondary:hover {
-  @apply text-sky-400 border-sky-400/50 bg-black;
-  transform: translateY(-1px);
+.btn-danger {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg
+    bg-transparent text-red-500 font-medium
+    border border-red-500/20
+    hover:bg-red-500/10 hover:border-red-500/30
+    focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-black
+    disabled:opacity-50 disabled:cursor-not-allowed
+    transition-all duration-200 ease-in-out
+    text-sm;
 }
 
 .feature-icon {
@@ -221,4 +232,13 @@ body {
 .animate-fade-in-delay {
   opacity: 0;
   animation: fadeIn 0.8s ease-out 0.4s forwards;
+}
+
+/* Add consistent input styles */
+.input-primary {
+  @apply w-full px-4 py-2 bg-black/30 
+    border border-sky-500/20 rounded-lg
+    text-white placeholder-gray-500
+    focus:outline-none focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/50
+    transition-all duration-200 ease-in-out;
 }
