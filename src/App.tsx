@@ -8,6 +8,7 @@ import { FileViewer } from './components/FileViewer';
 import { QuoteGenerator } from './components/QuoteGenerator';
 import { UnifiedCommunication } from './components/UnifiedCommunication';
 import { supabase } from './lib/supabase';
+import { WelcomeSplash } from './components/WelcomeSplash';
 
 interface UploadedFile {
   name: string;
@@ -36,6 +37,7 @@ export default function App() {
   const [selectedFile, setSelectedFile] = useState<UploadedFile | null>(null);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [showUnifiedComm, setShowUnifiedComm] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -128,6 +130,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-black">
+      {showWelcome && <WelcomeSplash onComplete={() => setShowWelcome(false)} />}
       <div className="relative isolate">
         {!user ? (
           <>
