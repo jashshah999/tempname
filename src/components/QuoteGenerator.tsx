@@ -54,17 +54,17 @@ export function QuoteGenerator({ onUploadClick, onViewExcel }: QuoteGeneratorPro
         
         {/* Input Options */}
         <div className="mb-8">
-          <h3 className="text-lg font-semibold text-yellow-500 mb-4">Step 1: Choose Input Method</h3>
+          <h3 className="text-lg font-semibold text-sky-500 mb-4">Step 1: Choose Input Method</h3>
           <div className="flex flex-col sm:flex-row gap-4 items-center">
             <div className="flex-1 w-full">
               <textarea
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                className="w-full px-3 py-2 bg-black/50 border border-yellow-500/20 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 text-white h-32"
+                className="w-full px-3 py-2 bg-black/50 border border-sky-500/20 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500/50 text-white h-32"
                 placeholder="Enter product details, specifications, and requirements..."
               />
             </div>
-            <div className="text-yellow-500 font-medium">OR</div>
+            <div className="text-sky-500 font-medium">OR</div>
             <div className="flex-1 w-full">
               <button
                 onClick={onUploadClick}
@@ -81,7 +81,7 @@ export function QuoteGenerator({ onUploadClick, onViewExcel }: QuoteGeneratorPro
 
         {/* Generate Options */}
         <div>
-          <h3 className="text-lg font-semibold text-yellow-500 mb-4">Step 2: Generate Quote</h3>
+          <h3 className="text-lg font-semibold text-sky-500 mb-4">Step 2: Generate Quote</h3>
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={generateTextQuote}
@@ -90,7 +90,7 @@ export function QuoteGenerator({ onUploadClick, onViewExcel }: QuoteGeneratorPro
               <FileText className="h-4 w-4 mr-2" />
               Generate Text Quote
             </button>
-            <div className="text-yellow-500 font-medium self-center">OR</div>
+            <div className="text-sky-500 font-medium self-center">OR</div>
             <button
               onClick={generateExcelQuote}
               className="flex-1 btn-secondary inline-flex items-center justify-center"
@@ -105,7 +105,7 @@ export function QuoteGenerator({ onUploadClick, onViewExcel }: QuoteGeneratorPro
       {generatedQuote && (
         <div className="glass-card p-8">
           <h3 className="text-xl font-bold text-white mb-4">Generated Quote</h3>
-          <div className="bg-black/50 border border-yellow-500/20 rounded-md p-4 text-white whitespace-pre-wrap">
+          <div className="bg-black/50 border border-sky-500/20 rounded-md p-4 text-white whitespace-pre-wrap">
             {generatedQuote}
           </div>
         </div>

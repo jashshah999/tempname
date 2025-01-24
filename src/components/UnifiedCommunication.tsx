@@ -62,44 +62,44 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
         {/* Main Content */}
         <div className="flex h-[calc(100%-4rem)]">
           {/* Sidebar */}
-          <div className="w-64 border-r border-yellow-500/20 pr-4">
+          <div className="w-64 border-r border-sky-500/20 pr-4">
             <div className="space-y-2">
               <button
                 onClick={() => setActiveTab('email')}
                 className={`w-full text-left p-3 rounded-lg flex items-center space-x-3 ${
-                  activeTab === 'email' ? 'bg-yellow-500/10 text-yellow-500' : 'hover:bg-yellow-500/5'
+                  activeTab === 'email' ? 'bg-sky-500/10 text-sky-500' : 'hover:bg-sky-500/5'
                 }`}
               >
-                <Mail className="h-5 w-5" />
+                <Mail className="h-16 w-16 text-sky-500/50 mb-4" />
                 <span>Email</span>
                 {!isConfigured.email && (
-                  <span className="ml-auto text-xs text-yellow-500">Setup Required</span>
+                  <span className="ml-auto text-xs text-sky-500">Setup Required</span>
                 )}
               </button>
               
               <button
                 onClick={() => setActiveTab('whatsapp')}
                 className={`w-full text-left p-3 rounded-lg flex items-center space-x-3 ${
-                  activeTab === 'whatsapp' ? 'bg-yellow-500/10 text-yellow-500' : 'hover:bg-yellow-500/5'
+                  activeTab === 'whatsapp' ? 'bg-sky-500/10 text-sky-500' : 'hover:bg-sky-500/5'
                 }`}
               >
-                <MessageSquare className="h-5 w-5" />
+                <MessageSquare className="h-16 w-16 text-sky-500/50 mb-4" />
                 <span>WhatsApp</span>
                 {!isConfigured.whatsapp && (
-                  <span className="ml-auto text-xs text-yellow-500">Setup Required</span>
+                  <span className="ml-auto text-xs text-sky-500">Setup Required</span>
                 )}
               </button>
               
               <button
                 onClick={() => setActiveTab('sheets')}
                 className={`w-full text-left p-3 rounded-lg flex items-center space-x-3 ${
-                  activeTab === 'sheets' ? 'bg-yellow-500/10 text-yellow-500' : 'hover:bg-yellow-500/5'
+                  activeTab === 'sheets' ? 'bg-sky-500/10 text-sky-500' : 'hover:bg-sky-500/5'
                 }`}
               >
-                <FileSpreadsheet className="h-5 w-5" />
+                <FileSpreadsheet className="h-16 w-16 text-sky-500/50 mb-4" />
                 <span>Sheets</span>
                 {!isConfigured.sheets && (
-                  <span className="ml-auto text-xs text-yellow-500">Setup Required</span>
+                  <span className="ml-auto text-xs text-sky-500">Setup Required</span>
                 )}
               </button>
             </div>
@@ -120,7 +120,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
               <div className="h-full">
                 {!isConfigured.email ? (
                   <div className="flex flex-col items-center justify-center h-full">
-                    <Mail className="h-16 w-16 text-yellow-500/50 mb-4" />
+                    <Mail className="h-16 w-16 text-sky-500/50 mb-4" />
                     <h3 className="text-xl font-bold text-white mb-2">Connect Gmail Account</h3>
                     <p className="text-gray-400 mb-4 text-center max-w-md">
                       Connect your Gmail account to send and receive emails directly from this interface.
@@ -142,7 +142,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
               <div className="h-full">
                 {!isConfigured.whatsapp ? (
                   <div className="flex flex-col items-center justify-center h-full">
-                    <MessageSquare className="h-16 w-16 text-yellow-500/50 mb-4" />
+                    <MessageSquare className="h-16 w-16 text-sky-500/50 mb-4" />
                     <h3 className="text-xl font-bold text-white mb-2">Connect WhatsApp</h3>
                     <p className="text-gray-400 mb-4 text-center max-w-md">
                       Link your WhatsApp account to send and receive messages from this interface.
@@ -164,7 +164,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
               <div className="h-full">
                 {!isConfigured.sheets ? (
                   <div className="flex flex-col items-center justify-center h-full">
-                    <FileSpreadsheet className="h-16 w-16 text-yellow-500/50 mb-4" />
+                    <FileSpreadsheet className="h-16 w-16 text-sky-500/50 mb-4" />
                     <h3 className="text-xl font-bold text-white mb-2">Connect Google Sheets</h3>
                     <p className="text-gray-400 mb-4 text-center max-w-md">
                       Connect your Google Sheets to view and edit spreadsheets directly.

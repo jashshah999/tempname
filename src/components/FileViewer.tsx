@@ -285,7 +285,7 @@ export function FileViewer({ url, type, onClose, onUpdate, data }: FileViewerPro
                 className="btn-secondary text-xs py-1 px-2 inline-flex items-center space-x-1"
               >
                 {saving ? (
-                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-yellow-500"></div>
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-sky-500"></div>
                 ) : (
                   <Save className="h-3 w-3" />
                 )}
@@ -306,7 +306,7 @@ export function FileViewer({ url, type, onClose, onUpdate, data }: FileViewerPro
             <div className="text-red-500 text-sm">{error}</div>
           ) : loading ? (
             <div className="flex items-center justify-center h-full">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-500"></div>
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-sky-500"></div>
             </div>
           ) : type === 'PDF' ? (
             <div className="h-full flex flex-col items-center bg-gray-900">
@@ -315,7 +315,7 @@ export function FileViewer({ url, type, onClose, onUpdate, data }: FileViewerPro
                 onLoadSuccess={onDocumentLoadSuccess}
                 loading={
                   <div className="flex items-center justify-center h-full">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-500"></div>
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-sky-500"></div>
                   </div>
                 }
               >
@@ -331,7 +331,7 @@ export function FileViewer({ url, type, onClose, onUpdate, data }: FileViewerPro
                   <button
                     onClick={() => setPageNumber(page => Math.max(1, page - 1))}
                     disabled={pageNumber <= 1}
-                    className="text-xs text-yellow-500 disabled:text-gray-500"
+                    className="text-xs text-sky-500 disabled:text-gray-500"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </button>
@@ -341,7 +341,7 @@ export function FileViewer({ url, type, onClose, onUpdate, data }: FileViewerPro
                   <button
                     onClick={() => setPageNumber(page => Math.min(numPages || 1, page + 1))}
                     disabled={pageNumber >= (numPages || 1)}
-                    className="text-xs text-yellow-500 disabled:text-gray-500"
+                    className="text-xs text-sky-500 disabled:text-gray-500"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </button>
@@ -353,13 +353,13 @@ export function FileViewer({ url, type, onClose, onUpdate, data }: FileViewerPro
               <table className="min-w-full divide-y divide-gray-800">
                 <tbody className="text-xs">
                   {excelData.map((row, rowIndex) => (
-                    <tr key={rowIndex} className={rowIndex === 0 ? 'bg-yellow-500/10' : ''}>
+                    <tr key={rowIndex} className={rowIndex === 0 ? 'bg-sky-500/10' : ''}>
                       {row.map((cell, colIndex) => (
                         <td
                           key={colIndex}
                           className={`px-2 py-1 whitespace-nowrap relative ${
                             rowIndex === 0
-                              ? 'font-medium text-yellow-500'
+                              ? 'font-medium text-sky-500'
                               : 'text-gray-300'
                           }`}
                           style={{ width: `${columnWidths[colIndex]}px` }}
@@ -371,7 +371,7 @@ export function FileViewer({ url, type, onClose, onUpdate, data }: FileViewerPro
                               onChange={handleCellChange}
                               onBlur={handleCellBlur}
                               onKeyDown={handleKeyDown}
-                              className="w-full bg-black/50 border border-yellow-500 rounded px-1 py-0.5 text-white focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                              className="w-full bg-black/50 border border-sky-500 rounded px-1 py-0.5 text-white focus:outline-none focus:ring-1 focus:ring-sky-500"
                               autoFocus
                             />
                           ) : (
@@ -384,7 +384,7 @@ export function FileViewer({ url, type, onClose, onUpdate, data }: FileViewerPro
                           )}
                           {colIndex < row.length - 1 && (
                             <div
-                              className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-yellow-500/30"
+                              className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-sky-500/30"
                               onMouseDown={(e) => handleColumnResizeStart(e, colIndex)}
                             />
                           )}

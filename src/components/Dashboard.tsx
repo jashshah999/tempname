@@ -147,12 +147,12 @@ export function Dashboard({ files, onUploadClick, onDeleteComplete, onFileView, 
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="glass p-4 rounded-lg border-dashed border-2 border-yellow-500/30 hover:border-yellow-500/50 transition-colors">
-            <p className="text-yellow-500 font-medium mb-2">Excel Documents</p>
+          <div className="glass p-4 rounded-lg border-dashed border-2 border-sky-500/30 hover:border-sky-500/50 transition-colors">
+            <p className="text-sky-500 font-medium mb-2">Excel Documents</p>
             <p className="text-gray-400 text-sm">Upload Excel files for processing</p>
           </div>
-          <div className="glass p-4 rounded-lg border-dashed border-2 border-yellow-500/30 hover:border-yellow-500/50 transition-colors">
-            <p className="text-yellow-500 font-medium mb-2">PDF Documents</p>
+          <div className="glass p-4 rounded-lg border-dashed border-2 border-sky-500/30 hover:border-sky-500/50 transition-colors">
+            <p className="text-sky-500 font-medium mb-2">PDF Documents</p>
             <p className="text-gray-400 text-sm">Upload PDF files for reference</p>
           </div>
         </div>

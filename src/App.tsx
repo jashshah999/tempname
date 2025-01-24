@@ -128,91 +128,49 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-black">
-      <div className="relative">
-        {/* Navigation */}
-        <nav className="glass border-b border-yellow-500/20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16 items-center">
-              <div className="flex-shrink-0 flex items-center space-x-3">
-                <div className="logo-container">
-                  <div className="logo-icon">
-                    <Workflow className="h-8 w-8" />
-                    <Sparkles className="h-4 w-4 absolute -top-1 -right-1" />
+      <div className="relative isolate">
+        {!user ? (
+          <>
+            {/* Navigation */}
+            <nav className="absolute w-full top-0 z-10">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between h-20">
+                  <div className="logo-container">
+                    <div className="logo-icon">
+                      <Workflow className="h-8 w-8" />
+                    </div>
+                    <div className="logo-text">
+                      <span className="text-xl font-bold text-white">MSME Flow</span>
+                      <span className="text-sm text-gray-400">Business Operations Platform</span>
+                    </div>
                   </div>
-                  <div className="logo-text">
-                    <span className="text-xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-transparent bg-clip-text">
-                      FlowMSME
-                    </span>
-                    <span className="text-xs text-yellow-500/60 block -mt-1">Business Accelerator</span>
+                  <div className="flex items-center space-x-4">
+                    <button
+                      onClick={() => setIsLoginOpen(true)}
+                      className="btn-secondary"
+                    >
+                      Login
+                    </button>
+                    <button
+                      onClick={() => setIsSignUpOpen(true)}
+                      className="btn-primary"
+                    >
+                      Get Started
+                    </button>
                   </div>
                 </div>
               </div>
-              {!user ? (
-                <div className="flex items-center space-x-4">
-                  <button
-                    onClick={() => setIsLoginOpen(true)}
-                    className="btn-secondary"
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    onClick={() => setIsSignUpOpen(true)}
-                    className="btn-primary"
-                  >
-                    Get Started
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-4">
-                  <button
-                    onClick={() => setShowUnifiedComm(true)}
-                    className="btn-secondary"
-                  >
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Unified UI
-                  </button>
-                  <button
-                    onClick={() => setShowDashboard(!showDashboard)}
-                    className="btn-secondary"
-                  >
-                    <Settings className="h-4 w-4 mr-2" />
-                    Settings
-                  </button>
-                  <button
-                    onClick={() => supabase.auth.signOut()}
-                    className="btn-secondary"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </nav>
+            </nav>
 
-        {user ? (
-          showDashboard ? (
-            <Dashboard 
-              files={uploadedFiles} 
-              onUploadClick={() => setShowUploader(true)}
-              onDeleteComplete={handleDeleteComplete}
-              onFileView={(file) => setSelectedFile(file)}
-              onFileUpdate={handleFileUpdate}
-            />
-          ) : (
-            <QuoteGenerator 
-              onUploadClick={() => setShowUploader(true)}
-              onViewExcel={(file) => setSelectedFile(file)}
-            />
-          )
-        ) : (
-          <>
             {/* Hero Section */}
-            <div className="relative overflow-hidden">
+            <div className="relative pt-14">
+              <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
+                {/* ... gradient background ... */}
+              </div>
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 text-center hero-content">
                 <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">
                   <span className="block mb-2">Streamline Your Business</span>
-                  <span className="block text-yellow-500">Operations in One Place</span>
+                  <span className="block text-sky-500">Operations in One Place</span>
                 </h1>
                 <p className="mt-6 max-w-2xl mx-auto text-lg sm:text-xl text-gray-400">
                   The ultimate platform for Indian MSMEs to manage quotations, vendors, leads, and communications - all in one unified interface.
@@ -220,18 +178,15 @@ export default function App() {
                 <div className="mt-10">
                   <button
                     onClick={() => setIsSignUpOpen(true)}
-                    className="btn-primary inline-flex items-center"
+                    className="btn-primary text-lg px-8 py-3"
                   >
                     Get Started
-                    <ArrowRight className="ml-2 h-5 w-5" />
                   </button>
                 </div>
               </div>
-            </div>
 
-            {/* Features Section with scroll animations */}
-            <div className="py-16 border-t border-yellow-500/20">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              {/* Features Section */}
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
                 <div className="text-center scroll-fade-in">
                   <h2 className="text-3xl font-bold text-white mb-4">
                     Everything You Need to Grow Your Business
@@ -271,6 +226,136 @@ export default function App() {
                 </div>
               </div>
             </div>
+          </>
+        ) : (
+          <>
+            {/* Navigation */}
+            <nav className="glass border-b border-sky-500/20">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-between h-16 items-center">
+                  <div className="flex-shrink-0 flex items-center space-x-3">
+                    <div className="logo-container">
+                      <div className="logo-icon">
+                        <Workflow className="h-8 w-8" />
+                        <Sparkles className="h-4 w-4 absolute -top-1 -right-1" />
+                      </div>
+                      <div className="logo-text">
+                        <span className="text-xl font-bold bg-gradient-to-r from-sky-400 via-sky-500 to-sky-600 text-transparent bg-clip-text">
+                          FlowMSME
+                        </span>
+                        <span className="text-xs text-sky-500/60 block -mt-1">Business Accelerator</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <button
+                      onClick={() => setShowUnifiedComm(true)}
+                      className="btn-secondary"
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Unified UI
+                    </button>
+                    <button
+                      onClick={() => setShowDashboard(!showDashboard)}
+                      className="btn-secondary"
+                    >
+                      <Settings className="h-4 w-4 mr-2" />
+                      Settings
+                    </button>
+                    <button
+                      onClick={() => supabase.auth.signOut()}
+                      className="btn-secondary"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </nav>
+
+            {user ? (
+              showDashboard ? (
+                <Dashboard 
+                  files={uploadedFiles} 
+                  onUploadClick={() => setShowUploader(true)}
+                  onDeleteComplete={handleDeleteComplete}
+                  onFileView={(file) => setSelectedFile(file)}
+                  onFileUpdate={handleFileUpdate}
+                />
+              ) : (
+                <QuoteGenerator 
+                  onUploadClick={() => setShowUploader(true)}
+                  onViewExcel={(file) => setSelectedFile(file)}
+                />
+              )
+            ) : (
+              <>
+                {/* Hero Section */}
+                <div className="relative overflow-hidden">
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 text-center hero-content">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">
+                      <span className="block mb-2">Streamline Your Business</span>
+                      <span className="block text-sky-500">Operations in One Place</span>
+                    </h1>
+                    <p className="mt-6 max-w-2xl mx-auto text-lg sm:text-xl text-gray-400">
+                      The ultimate platform for Indian MSMEs to manage quotations, vendors, leads, and communications - all in one unified interface.
+                    </p>
+                    <div className="mt-10">
+                      <button
+                        onClick={() => setIsSignUpOpen(true)}
+                        className="btn-primary inline-flex items-center"
+                      >
+                        Get Started
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Features Section with scroll animations */}
+                <div className="py-16 border-t border-sky-500/20">
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center scroll-fade-in">
+                      <h2 className="text-3xl font-bold text-white mb-4">
+                        Everything You Need to Grow Your Business
+                      </h2>
+                    </div>
+
+                    <div className="mt-16">
+                      <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+                        {[
+                          {
+                            icon: FileText,
+                            title: "Quick Quotations",
+                            description: "Generate and manage quotations specific to your business needs instantly."
+                          },
+                          {
+                            icon: Settings,
+                            title: "Vendor Management",
+                            description: "Send RFQs and manage your vendor relationships efficiently."
+                          },
+                          {
+                            icon: FileText,
+                            title: "Unified Communication",
+                            description: "WhatsApp and email integration for seamless communication."
+                          }
+                        ].map((feature, index) => (
+                          <div key={index} className="feature-card scroll-fade-in">
+                            <div className="feature-icon">
+                              <feature.icon className="h-6 w-6" />
+                            </div>
+                            <h3 className="text-lg font-bold text-white mb-2">{feature.title}</h3>
+                            <p className="text-gray-400">
+                              {feature.description}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </>
         )}
 

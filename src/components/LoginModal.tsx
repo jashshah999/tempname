@@ -91,7 +91,7 @@ export function LoginModal({ isOpen, onClose, onSignUpClick }: LoginModalProps) 
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 bg-black/50 border border-yellow-500/20 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 text-white"
+              className="w-full px-3 py-2 bg-black/50 border border-sky-500/20 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500/50 text-white"
               required
             />
           </div>
@@ -104,7 +104,7 @@ export function LoginModal({ isOpen, onClose, onSignUpClick }: LoginModalProps) 
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 bg-black/50 border border-yellow-500/20 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 text-white"
+              className="w-full px-3 py-2 bg-black/50 border border-sky-500/20 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500/50 text-white"
               required
             />
           </div>
@@ -119,7 +119,7 @@ export function LoginModal({ isOpen, onClose, onSignUpClick }: LoginModalProps) 
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-yellow-500/20"></div>
+              <div className="w-full border-t border-sky-500/20"></div>
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-black text-gray-400">Or continue with</span>
@@ -157,7 +157,7 @@ export function LoginModal({ isOpen, onClose, onSignUpClick }: LoginModalProps) 
             <button
               type="button"
               onClick={onSignUpClick}
-              className="text-yellow-500 hover:text-yellow-400"
+              className="text-sky-500 hover:text-sky-400"
             >
               Sign up
             </button>
