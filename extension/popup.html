@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MSME Flow</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Login Form -->
+    <div id="loginForm" class="container">
+      <h2>Login to MSME Flow</h2>
+      <div class="form-group">
+        <input type="email" id="email" placeholder="Email" />
+      </div>
+      <div class="form-group">
+        <input type="password" id="password" placeholder="Password" />
+      </div>
+      <button id="loginBtn" class="btn-primary">Login</button>
+      <div id="loginError" class="error-message"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" class="container" style="display: none;">
+      <div class="header">
+        <h2>Quote Generator</h2>
+        <button id="settingsBtn" class="btn-secondary">Settings</button>
+      </div>
+      
+      <div class="actions">
+        <button id="generateQuoteBtn" class="btn-secondary">
+          <span class="icon">📝</span>
+          Generate Quote
+        </button>
+        <button id="generateExcelBtn" class="btn-secondary">
+          <span class="icon">📊</span>
+          Generate Excel Quote
+        </button>
+      </div>
+
+      <div id="quoteResult" class="result-container" style="display: none;">
+        <h3>Generated Quote</h3>
+        <div id="quoteText" class="quote-text"></div>
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
