@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, MessageSquare, FileSpreadsheet, Settings, X, Plus, LogOut, Reply, ArrowLeft, Send, Loader, RefreshCw } from 'lucide-react';
+import { Mail, MessageSquare, FileSpreadsheet, Settings, X, Plus, LogOut, Reply, ArrowLeft, Send, Loader, RefreshCw, Download, Paperclip, Image, FileText, File, ZoomIn, ZoomOut } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import DOMPurify from 'dompurify';
 
 interface UnifiedCommunicationProps {
   onClose: () => void;
@@ -31,6 +32,64 @@ interface EmailState {
     cc?: string[];
     bcc?: string[];
   } | null;
+  selectedImage: string | null;
+}
+
+interface EmailAttachment {
+  id: string;
+  filename: string;
+  mimeType: string;
+  size: number;
+  attachmentId: string;
+}
+
+interface EmailData {
+  id: string;
+  from: string;
+  subject: string;
+  date: string;
+  snippet: string;
+  body?: string;
+  bodyHtml?: string;
+  attachments?: EmailAttachment[];
+  unread?: boolean;
+}
+
+interface ImageViewerProps {
+  src: string;
+  onClose: () => void;
+}
+
+function ImageViewer({ src, onClose }: ImageViewerProps) {
+  const [zoomed, setZoomed] = useState(false);
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center" onClick={onClose}>
+      <div className="absolute top-4 right-4 flex gap-2">
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            setZoomed(!zoomed);
+          }}
+          className="p-2 rounded-full bg-gray-800/50 hover:bg-gray-800 text-gray-400 hover:text-white"
+        >
+          {zoomed ? <ZoomOut className="h-5 w-5" /> : <ZoomIn className="h-5 w-5" />}
+        </button>
+        <button 
+          onClick={onClose}
+          className="p-2 rounded-full bg-gray-800/50 hover:bg-gray-800 text-gray-400 hover:text-white"
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </div>
+      <img 
+        src={src} 
+        alt="Full size preview"
+        className={`max-h-[90vh] ${zoomed ? 'max-w-none' : 'max-w-[90vw]'} rounded-lg`}
+        onClick={(e) => e.stopPropagation()}
+      />
+    </div>
+  );
 }
 
 export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
@@ -47,7 +106,8 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
     view: 'list',
     selectedEmail: null,
     searchQuery: '',
-    composing: null
+    composing: null,
+    selectedImage: null
   });
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -399,37 +459,108 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
     }
   };
 
-  // Add function to fetch email detail
-  const fetchEmailDetail = async (emailId: string) => {
+  const fetchEmailDetail = async (messageId: string) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.provider_token) return;
+      if (!session?.provider_token) return null;
 
       const response = await fetch(
-        `https://www.googleapis.com/gmail/v1/users/me/messages/${emailId}?format=full`,
-        {
+        `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=full`, {
           headers: {
             'Authorization': `Bearer ${session.provider_token}`
           }
         }
       );
 
+      if (!response.ok) return null;
       const data = await response.json();
-      
-      // Parse email body
-      const body = data.payload.parts?.find(
-        (part: any) => part.mimeType === 'text/plain'
-      )?.body?.data;
 
-      if (body) {
-        const decodedBody = atob(body.replace(/-/g, '+').replace(/_/g, '/'));
-        return decodedBody;
-      }
-      
-      return '';
+      // Parse email parts
+      const parts = data.payload.parts || [data.payload];
+      let bodyText = '';
+      let bodyHtml = '';
+      const attachments: EmailAttachment[] = [];
+
+      const processMessagePart = (part: any) => {
+        const { mimeType, body, filename, headers = [] } = part;
+
+        // Handle nested parts
+        if (part.parts) {
+          part.parts.forEach(processMessagePart);
+          return;
+        }
+
+        // Handle attachments
+        if (filename && filename.length > 0) {
+          attachments.push({
+            id: part.body.attachmentId,
+            filename,
+            mimeType,
+            size: body.size,
+            attachmentId: body.attachmentId
+          });
+          return;
+        }
+
+        // Handle email body
+        if (body.data) {
+          const content = atob(body.data.replace(/-/g, '+').replace(/_/g, '/'));
+          if (mimeType === 'text/plain') {
+            bodyText = content;
+          } else if (mimeType === 'text/html') {
+            bodyHtml = content;
+          }
+        }
+      };
+
+      parts.forEach(processMessagePart);
+
+      return {
+        body: bodyText,
+        bodyHtml: bodyHtml,
+        attachments
+      };
     } catch (error) {
       console.error('Error fetching email detail:', error);
-      return '';
+      return null;
+    }
+  };
+
+  const downloadAttachment = async (messageId: string, attachment: EmailAttachment) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.provider_token) return;
+
+      const response = await fetch(
+        `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}/attachments/${attachment.attachmentId}`, {
+          headers: {
+            'Authorization': `Bearer ${session.provider_token}`
+          }
+        }
+      );
+
+      if (!response.ok) throw new Error('Failed to fetch attachment');
+      const data = await response.json();
+
+      // Convert base64 to blob
+      const binaryData = atob(data.data.replace(/-/g, '+').replace(/_/g, '/'));
+      const bytes = new Uint8Array(binaryData.length);
+      for (let i = 0; i < binaryData.length; i++) {
+        bytes[i] = binaryData.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: attachment.mimeType });
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = attachment.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading attachment:', error);
     }
   };
 
@@ -446,6 +577,125 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
           <button onClick={handleGmailAuth} className="btn-primary">
             Connect Gmail
           </button>
+        </div>
+      );
+    }
+
+    if (emailState.view === 'detail' && emailState.selectedEmail) {
+      return (
+        <div className="fixed inset-0 z-50 bg-black/95">
+          <div className="h-full overflow-y-auto">
+            <div className="max-w-5xl mx-auto px-4 py-6">
+              {/* Email Header */}
+              <div className="flex justify-between items-start mb-8 sticky top-0 bg-black/95 py-4 z-10">
+                <div>
+                  <h1 className="text-2xl font-bold text-white mb-2">
+                    {emailState.selectedEmail.subject}
+                  </h1>
+                  <div className="flex items-center gap-4 text-gray-400">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-sky-500/10 flex items-center justify-center">
+                        <span className="text-sky-500 font-medium">
+                          {emailState.selectedEmail.from.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div>
+                        <div className="font-medium">{emailState.selectedEmail.from}</div>
+                        <div className="text-sm text-gray-500">{emailState.selectedEmail.date}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleReply(emailState.selectedEmail!)}
+                    className="btn-primary"
+                  >
+                    <Reply className="h-4 w-4 mr-2" />
+                    Reply
+                  </button>
+                  <button
+                    onClick={() => setEmailState(prev => ({ ...prev, view: 'list' }))}
+                    className="btn-secondary"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Attachments */}
+              {emailState.selectedEmail.attachments?.length > 0 && (
+                <div className="mb-8 bg-gray-900/50 rounded-xl p-6">
+                  <h3 className="text-sm font-medium text-gray-400 mb-4">
+                    Attachments ({emailState.selectedEmail.attachments.length})
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {emailState.selectedEmail.attachments.map((attachment) => (
+                      <button
+                        key={attachment.id}
+                        onClick={() => downloadAttachment(emailState.selectedEmail!.id, attachment)}
+                        className="flex items-center gap-3 p-4 bg-gray-800/50 hover:bg-gray-800 rounded-lg transition-colors group"
+                      >
+                        <div className="p-2 rounded-lg bg-gray-700/50 group-hover:bg-gray-700">
+                          {attachment.mimeType.startsWith('image/') ? (
+                            <Image className="h-5 w-5 text-sky-500" />
+                          ) : attachment.mimeType.includes('pdf') ? (
+                            <FileText className="h-5 w-5 text-red-500" />
+                          ) : (
+                            <File className="h-5 w-5 text-yellow-500" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm text-gray-300 truncate">
+                            {attachment.filename}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {Math.round(attachment.size / 1024)}KB
+                          </div>
+                        </div>
+                        <Download className="h-4 w-4 text-gray-400 group-hover:text-white" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Email Body */}
+              <div className="bg-gray-900/50 rounded-xl p-8 mb-8">
+                {emailState.selectedEmail.bodyHtml ? (
+                  <div 
+                    className="email-content prose prose-invert max-w-none"
+                    dangerouslySetInnerHTML={{ 
+                      __html: DOMPurify.sanitize(
+                        processHtmlContent(emailState.selectedEmail.bodyHtml),
+                        {
+                          ALLOWED_TAGS: [
+                            'p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li',
+                            'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote',
+                            'a', 'img', 'div', 'span', 'table', 'tr', 'td', 'th'
+                          ],
+                          ALLOWED_ATTR: [
+                            'href', 'src', 'alt', 'style', 'class', 'target',
+                            'data-action'
+                          ]
+                        }
+                      )
+                    }}
+                    onClick={e => {
+                      const target = e.target as HTMLElement;
+                      if (target.tagName === 'IMG' && target.getAttribute('data-action') === 'zoom') {
+                        handleImageClick(e as any);
+                      }
+                    }}
+                  />
+                ) : (
+                  <pre className="whitespace-pre-wrap font-sans text-gray-300">
+                    {emailState.selectedEmail.body || emailState.selectedEmail.snippet}
+                  </pre>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       );
     }
@@ -567,44 +817,6 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
                 </div>
               </div>
             </div>
-          ) : emailState.view === 'detail' && emailState.selectedEmail ? (
-            <div className="p-4 h-full overflow-y-auto">
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <h2 className="text-xl font-bold text-white mb-2">
-                    {emailState.selectedEmail.subject}
-                  </h2>
-                  <div className="space-y-1">
-                    <p className="text-gray-400">
-                      <span className="text-gray-500">From:</span> {emailState.selectedEmail.from}
-                    </p>
-                    <p className="text-gray-400">
-                      <span className="text-gray-500">Date:</span> {emailState.selectedEmail.date}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={() => handleReply(emailState.selectedEmail!)}
-                    className="btn-primary"
-                  >
-                    <Reply className="h-4 w-4 mr-2" />
-                    Reply
-                  </button>
-                  <button
-                    onClick={() => setEmailState(prev => ({ ...prev, view: 'list' }))}
-                    className="btn-secondary"
-                  >
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back
-                  </button>
-                </div>
-              </div>
-              
-              <div className="prose prose-invert max-w-none">
-                {emailState.selectedEmail.body || emailState.selectedEmail.snippet}
-              </div>
-            </div>
           ) : (
             <div className="divide-y divide-sky-500/10 overflow-y-auto h-full">
               {emails.map((email) => (
@@ -614,11 +826,11 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
                     email.unread ? 'bg-sky-500/10' : ''
                   }`}
                   onClick={async () => {
-                    const body = await fetchEmailDetail(email.id);
+                    const emailData = await fetchEmailDetail(email.id);
                     setEmailState(prev => ({
                       ...prev,
                       view: 'detail',
-                      selectedEmail: { ...email, body }
+                      selectedEmail: { ...email, ...emailData }
                     }));
                   }}
                 >
@@ -657,126 +869,165 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
     );
   };
 
+  const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
+    e.stopPropagation();
+    const src = e.currentTarget.src;
+    setEmailState(prev => ({ ...prev, selectedImage: src }));
+  };
+
+  const processHtmlContent = (html: string) => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    
+    // Process images to make them clickable
+    doc.querySelectorAll('img').forEach(img => {
+      img.classList.add('cursor-zoom-in', 'hover:opacity-90', 'transition-opacity');
+      img.setAttribute('data-action', 'zoom');
+    });
+
+    // Fix relative URLs in images
+    doc.querySelectorAll('img[src^="cid:"]').forEach(img => {
+      const contentId = img.getAttribute('src')?.replace('cid:', '');
+      const attachment = emailState.selectedEmail?.attachments?.find(
+        att => att.contentId === contentId
+      );
+      if (attachment?.dataUrl) {
+        img.setAttribute('src', attachment.dataUrl);
+      }
+    });
+
+    return doc.body.innerHTML;
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="glass-card w-full max-w-6xl h-[90vh] p-4 relative">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-white">Unified Communication</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        {/* Main Content */}
-        <div className="flex h-[calc(100%-4rem)]">
-          {/* Sidebar */}
-          <div className="w-64 border-r border-sky-500/20 pr-4">
-            <div className="space-y-2">
-              <button
-                onClick={() => setActiveTab('email')}
-                className={`w-full text-left p-3 rounded-lg flex items-center space-x-3 ${
-                  activeTab === 'email' ? 'bg-sky-500/10 text-sky-500' : 'hover:bg-sky-500/5'
-                }`}
-              >
-                <Mail className="h-16 w-16 text-sky-500/50 mb-4" />
-                <span>Email</span>
-                {!isConfigured.email && (
-                  <span className="ml-auto text-xs text-sky-500">Setup Required</span>
-                )}
-              </button>
-              
-              <button
-                onClick={() => setActiveTab('whatsapp')}
-                className={`w-full text-left p-3 rounded-lg flex items-center space-x-3 ${
-                  activeTab === 'whatsapp' ? 'bg-sky-500/10 text-sky-500' : 'hover:bg-sky-500/5'
-                }`}
-              >
-                <MessageSquare className="h-16 w-16 text-sky-500/50 mb-4" />
-                <span>WhatsApp</span>
-                {!isConfigured.whatsapp && (
-                  <span className="ml-auto text-xs text-sky-500">Setup Required</span>
-                )}
-              </button>
-              
-              <button
-                onClick={() => setActiveTab('sheets')}
-                className={`w-full text-left p-3 rounded-lg flex items-center space-x-3 ${
-                  activeTab === 'sheets' ? 'bg-sky-500/10 text-sky-500' : 'hover:bg-sky-500/5'
-                }`}
-              >
-                <FileSpreadsheet className="h-16 w-16 text-sky-500/50 mb-4" />
-                <span>Sheets</span>
-                {!isConfigured.sheets && (
-                  <span className="ml-auto text-xs text-sky-500">Setup Required</span>
-                )}
-              </button>
-            </div>
-
-            {/* Settings */}
-            <div className="absolute bottom-4 left-4 w-56">
-              <button className="w-full btn-secondary flex items-center justify-center space-x-2">
-                <Settings className="h-4 w-4" />
-                <span>Settings</span>
-              </button>
-            </div>
+    <>
+      <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div className="glass-card w-full max-w-6xl h-[90vh] p-4 relative">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-white">Unified Communication</h2>
+            <button onClick={onClose} className="text-gray-400 hover:text-white">
+              <X className="h-5 w-5" />
+            </button>
           </div>
 
-          {/* Content Area */}
-          <div className="flex-1 pl-4 overflow-hidden">
-            {/* Email Tab */}
-            {activeTab === 'email' && (
-              <div className="h-full">
-                {renderEmailInterface()}
+          {/* Main Content */}
+          <div className="flex h-[calc(100%-4rem)]">
+            {/* Sidebar */}
+            <div className="w-64 border-r border-sky-500/20 pr-4">
+              <div className="space-y-2">
+                <button
+                  onClick={() => setActiveTab('email')}
+                  className={`w-full text-left p-3 rounded-lg flex items-center space-x-3 ${
+                    activeTab === 'email' ? 'bg-sky-500/10 text-sky-500' : 'hover:bg-sky-500/5'
+                  }`}
+                >
+                  <Mail className="h-16 w-16 text-sky-500/50 mb-4" />
+                  <span>Email</span>
+                  {!isConfigured.email && (
+                    <span className="ml-auto text-xs text-sky-500">Setup Required</span>
+                  )}
+                </button>
+                
+                <button
+                  onClick={() => setActiveTab('whatsapp')}
+                  className={`w-full text-left p-3 rounded-lg flex items-center space-x-3 ${
+                    activeTab === 'whatsapp' ? 'bg-sky-500/10 text-sky-500' : 'hover:bg-sky-500/5'
+                  }`}
+                >
+                  <MessageSquare className="h-16 w-16 text-sky-500/50 mb-4" />
+                  <span>WhatsApp</span>
+                  {!isConfigured.whatsapp && (
+                    <span className="ml-auto text-xs text-sky-500">Setup Required</span>
+                  )}
+                </button>
+                
+                <button
+                  onClick={() => setActiveTab('sheets')}
+                  className={`w-full text-left p-3 rounded-lg flex items-center space-x-3 ${
+                    activeTab === 'sheets' ? 'bg-sky-500/10 text-sky-500' : 'hover:bg-sky-500/5'
+                  }`}
+                >
+                  <FileSpreadsheet className="h-16 w-16 text-sky-500/50 mb-4" />
+                  <span>Sheets</span>
+                  {!isConfigured.sheets && (
+                    <span className="ml-auto text-xs text-sky-500">Setup Required</span>
+                  )}
+                </button>
               </div>
-            )}
 
-            {/* WhatsApp Tab */}
-            {activeTab === 'whatsapp' && (
-              <div className="h-full">
-                {!isConfigured.whatsapp ? (
-                  <div className="flex flex-col items-center justify-center h-full">
-                    <MessageSquare className="h-16 w-16 text-sky-500/50 mb-4" />
-                    <h3 className="text-xl font-bold text-white mb-2">Connect WhatsApp</h3>
-                    <p className="text-gray-400 mb-4 text-center max-w-md">
-                      Link your WhatsApp account to send and receive messages from this interface.
-                    </p>
-                    <button onClick={handleWhatsAppAuth} className="btn-primary">
-                      Connect WhatsApp
-                    </button>
-                  </div>
-                ) : (
-                  <div className="h-full">
-                    {/* WhatsApp interface will go here */}
-                  </div>
-                )}
+              {/* Settings */}
+              <div className="absolute bottom-4 left-4 w-56">
+                <button className="w-full btn-secondary flex items-center justify-center space-x-2">
+                  <Settings className="h-4 w-4" />
+                  <span>Settings</span>
+                </button>
               </div>
-            )}
+            </div>
 
-            {/* Sheets Tab */}
-            {activeTab === 'sheets' && (
-              <div className="h-full">
-                {!isConfigured.sheets ? (
-                  <div className="flex flex-col items-center justify-center h-full">
-                    <FileSpreadsheet className="h-16 w-16 text-sky-500/50 mb-4" />
-                    <h3 className="text-xl font-bold text-white mb-2">Connect Google Sheets</h3>
-                    <p className="text-gray-400 mb-4 text-center max-w-md">
-                      Connect your Google Sheets to view and edit spreadsheets directly.
-                    </p>
-                    <button onClick={handleSheetsAuth} className="btn-primary">
-                      Connect Sheets
-                    </button>
-                  </div>
-                ) : (
-                  <div className="h-full">
-                    {/* Sheets interface will go here */}
-                  </div>
-                )}
-              </div>
-            )}
+            {/* Content Area */}
+            <div className="flex-1 pl-4 overflow-hidden">
+              {/* Email Tab */}
+              {activeTab === 'email' && (
+                <div className="h-full">
+                  {renderEmailInterface()}
+                </div>
+              )}
+
+              {/* WhatsApp Tab */}
+              {activeTab === 'whatsapp' && (
+                <div className="h-full">
+                  {!isConfigured.whatsapp ? (
+                    <div className="flex flex-col items-center justify-center h-full">
+                      <MessageSquare className="h-16 w-16 text-sky-500/50 mb-4" />
+                      <h3 className="text-xl font-bold text-white mb-2">Connect WhatsApp</h3>
+                      <p className="text-gray-400 mb-4 text-center max-w-md">
+                        Link your WhatsApp account to send and receive messages from this interface.
+                      </p>
+                      <button onClick={handleWhatsAppAuth} className="btn-primary">
+                        Connect WhatsApp
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="h-full">
+                      {/* WhatsApp interface will go here */}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Sheets Tab */}
+              {activeTab === 'sheets' && (
+                <div className="h-full">
+                  {!isConfigured.sheets ? (
+                    <div className="flex flex-col items-center justify-center h-full">
+                      <FileSpreadsheet className="h-16 w-16 text-sky-500/50 mb-4" />
+                      <h3 className="text-xl font-bold text-white mb-2">Connect Google Sheets</h3>
+                      <p className="text-gray-400 mb-4 text-center max-w-md">
+                        Connect your Google Sheets to view and edit spreadsheets directly.
+                      </p>
+                      <button onClick={handleSheetsAuth} className="btn-primary">
+                        Connect Sheets
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="h-full">
+                      {/* Sheets interface will go here */}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Image Viewer Modal */}
+      {emailState.selectedImage && (
+        <ImageViewer
+          src={emailState.selectedImage}
+          onClose={() => setEmailState(prev => ({ ...prev, selectedImage: null }))}
+        />
+      )}
+    </>
   );
 }
