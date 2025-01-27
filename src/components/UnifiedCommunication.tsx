@@ -571,7 +571,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
     if (!isConfigured.email) {
       return (
         <div className="flex flex-col items-center justify-center h-full">
-          <Mail className="h-16 w-16 text-sky-500/50 mb-4" />
+          <Mail className="h-16 w-16 text-green-600/50 mb-4" />
           <h3 className="text-xl font-bold text-white mb-2">Connect Gmail Account</h3>
           <p className="text-gray-400 mb-4 text-center max-w-md">
             Connect your Gmail account to send and receive emails directly from this interface.
@@ -596,8 +596,8 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
                   </h1>
                   <div className="flex items-center gap-4 text-gray-400">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-sky-500/10 flex items-center justify-center">
-                        <span className="text-sky-500 font-medium">
+                      <div className="w-8 h-8 rounded-full bg-green-600/10 flex items-center justify-center">
+                        <span className="text-green-600 font-medium">
                           {emailState.selectedEmail.from.charAt(0).toUpperCase()}
                         </span>
                       </div>
@@ -640,7 +640,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
                       >
                         <div className="p-2 rounded-lg bg-gray-700/50 group-hover:bg-gray-700">
                           {attachment.mimeType.startsWith('image/') ? (
-                            <Image className="h-5 w-5 text-sky-500" />
+                            <Image className="h-5 w-5 text-green-600" />
                           ) : attachment.mimeType.includes('pdf') ? (
                             <FileText className="h-5 w-5 text-red-500" />
                           ) : (
@@ -707,7 +707,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
         {/* Header with user info and actions */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
-            <Mail className="h-5 w-5 text-sky-500" />
+            <Mail className="h-5 w-5 text-green-600" />
             <span className="text-white">{userEmail}</span>
           </div>
           <div className="flex items-center space-x-4">
@@ -745,10 +745,10 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
         </div>
 
         {/* Email Content Area */}
-        <div className="bg-black/30 rounded-lg border border-sky-500/20 h-[calc(100%-8rem)] overflow-hidden">
+        <div className="bg-neutral-800/30 rounded-lg border border-green-600/20 overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center h-full">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-500"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
             </div>
           ) : emailState.view === 'compose' ? (
             <div className="p-4">
@@ -800,7 +800,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
                     ...prev,
                     composing: { ...prev.composing!, body: e.target.value }
                   }))}
-                  className="input-primary h-64 px-3 py-2 bg-black/30 border border-sky-500/20 rounded text-white resize-none"
+                  className="input-primary h-64 px-3 py-2 bg-neutral-900/30 border border-green-600/20 rounded text-white resize-none"
                 />
                 <div className="flex justify-end space-x-3">
                   <button
@@ -820,12 +820,12 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
               </div>
             </div>
           ) : (
-            <div className="divide-y divide-sky-500/10 overflow-y-auto h-full">
+            <div className="divide-y divide-green-600/10 overflow-y-auto h-full">
               {emails.map((email) => (
                 <div 
                   key={email.id}
-                  className={`p-4 hover:bg-sky-500/5 cursor-pointer ${
-                    email.unread ? 'bg-sky-500/10' : ''
+                  className={`p-4 hover:bg-green-600/5 cursor-pointer ${
+                    email.unread ? 'bg-green-600/10' : ''
                   }`}
                   onClick={async () => {
                     const emailData = await fetchEmailDetail(email.id);
@@ -939,9 +939,9 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
   }, [isDragging]);
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-neutral-900">
       {/* Top Navigation Bar */}
-      <div className="bg-gray-900/50 border-b border-sky-500/20 px-4 py-3">
+      <div className="bg-neutral-800/50 px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="logo-icon">
@@ -977,13 +977,13 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
       >
         {/* Email Section */}
         <div 
-          className="h-full border-r border-sky-500/20 overflow-hidden"
+          className="h-full border-r border-neutral-700 overflow-hidden"
           style={{ width: `${splitPosition}%` }}
         >
           <div className="h-full">
             {!isConfigured.email ? (
               <div className="flex flex-col items-center justify-center h-full">
-                <Mail className="h-16 w-16 text-sky-500/50 mb-4" />
+                <Mail className="h-16 w-16 text-green-600/50 mb-4" />
                 <h3 className="text-xl font-bold text-white mb-2">Connect Gmail Account</h3>
                 <p className="text-gray-400 mb-4 text-center max-w-md">
                   Connect your Gmail account to send and receive emails directly.
@@ -1011,12 +1011,12 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
         >
           <div className={`
             absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
-            w-4 h-24 rounded-full bg-sky-500/10 opacity-0 
+            w-4 h-24 rounded-full bg-green-600/10 opacity-0 
             group-hover:opacity-100 transition-opacity
             ${isDragging ? 'opacity-100' : ''}
           `}>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-0.5 h-12 bg-sky-500/50 rounded-full" />
+              <div className="w-0.5 h-12 bg-green-600/50 rounded-full" />
             </div>
           </div>
         </div>
@@ -1029,7 +1029,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
           <div className="h-full">
             {!isConfigured.whatsapp ? (
               <div className="flex flex-col items-center justify-center h-full">
-                <MessageSquare className="h-16 w-16 text-sky-500/50 mb-4" />
+                <MessageSquare className="h-16 w-16 text-green-600/50 mb-4" />
                 <h3 className="text-xl font-bold text-white mb-2">Connect WhatsApp</h3>
                 <p className="text-gray-400 mb-4 text-center max-w-md">
                   Link your WhatsApp account to send and receive messages directly.

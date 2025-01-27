@@ -138,7 +138,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-neutral-900">
       {showWelcome && <WelcomeSplash onComplete={() => setShowWelcome(false)} />}
       <div className="relative isolate">
         {!user ? (
@@ -182,7 +182,7 @@ export default function App() {
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 text-center hero-content">
                 <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">
                   <span className="block mb-2">Streamline Your Business</span>
-                  <span className="block text-sky-500">Operations in One Place</span>
+                  <span className="block text-green-600">Operations in One Place</span>
                 </h1>
                 <p className="mt-6 max-w-2xl mx-auto text-lg sm:text-xl text-gray-400">
                   The ultimate platform for Indian MSMEs to manage quotations, vendors, leads, and communications - all in one unified interface.
@@ -242,7 +242,7 @@ export default function App() {
         ) : (
           <>
             {/* Navigation */}
-            <nav className="glass border-b border-sky-500/20">
+            <nav className="glass border-b border-green-700/20">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
                   <div className="flex-shrink-0 flex items-center space-x-3">
@@ -252,10 +252,10 @@ export default function App() {
                         <Sparkles className="h-4 w-4 absolute -top-1 -right-1" />
                       </div>
                       <div className="logo-text">
-                        <span className="text-xl font-bold bg-gradient-to-r from-sky-400 via-sky-500 to-sky-600 text-transparent bg-clip-text">
+                        <span className="text-xl font-bold bg-gradient-to-r from-green-700 via-green-700 to-green-700 text-transparent bg-clip-text">
                           FlowMSME
                         </span>
-                        <span className="text-xs text-sky-500/60 block -mt-1">Business Accelerator</span>
+                        <span className="text-xs text-green-700/60 block -mt-1">Business Accelerator</span>
                       </div>
                     </div>
                   </div>
@@ -307,7 +307,7 @@ export default function App() {
                   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 text-center hero-content">
                     <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">
                       <span className="block mb-2">Streamline Your Business</span>
-                      <span className="block text-sky-500">Operations in One Place</span>
+                      <span className="block text-green-600">Operations in One Place</span>
                     </h1>
                     <p className="mt-6 max-w-2xl mx-auto text-lg sm:text-xl text-gray-400">
                       The ultimate platform for Indian MSMEs to manage quotations, vendors, leads, and communications - all in one unified interface.
@@ -325,7 +325,7 @@ export default function App() {
                 </div>
 
                 {/* Features Section with scroll animations */}
-                <div className="py-16 border-t border-sky-500/20">
+                <div className="py-16 border-t border-green-700/20">
                   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center scroll-fade-in">
                       <h2 className="text-3xl font-bold text-white mb-4">

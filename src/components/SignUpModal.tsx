@@ -98,7 +98,7 @@ export function SignUpModal({ isOpen, onClose, onSuccess }: SignUpModalProps) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 bg-black/50 border border-sky-500/20 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500/50 text-white"
+              className="w-full px-3 py-2 bg-gray-800/50 border border-green-600/20 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600/30 focus:border-green-600/30 text-white"
               required
             />
           </div>
@@ -111,7 +111,7 @@ export function SignUpModal({ isOpen, onClose, onSuccess }: SignUpModalProps) {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 bg-black/50 border border-sky-500/20 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500/50 text-white"
+              className="w-full px-3 py-2 bg-gray-800/50 border border-green-600/20 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600/30 focus:border-green-600/30 text-white"
               required
               minLength={6}
             />
@@ -125,7 +125,7 @@ export function SignUpModal({ isOpen, onClose, onSuccess }: SignUpModalProps) {
               type="text"
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
-              className="w-full px-3 py-2 bg-black/50 border border-sky-500/20 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500/50 text-white"
+              className="w-full px-3 py-2 bg-gray-800/50 border border-green-600/20 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600/30 focus:border-green-600/30 text-white"
               required
             />
           </div>
@@ -138,7 +138,7 @@ export function SignUpModal({ isOpen, onClose, onSuccess }: SignUpModalProps) {
               type="text"
               value={businessType}
               onChange={(e) => setBusinessType(e.target.value)}
-              className="w-full px-3 py-2 bg-black/50 border border-sky-500/20 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500/50 text-white"
+              className="w-full px-3 py-2 bg-gray-800/50 border border-green-600/20 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600/30 focus:border-green-600/30 text-white"
               required
             />
           </div>
@@ -151,7 +151,7 @@ export function SignUpModal({ isOpen, onClose, onSuccess }: SignUpModalProps) {
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-3 py-2 bg-black/50 border border-sky-500/20 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500/50 text-white"
+              className="w-full px-3 py-2 bg-gray-800/50 border border-green-600/20 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600/30 focus:border-green-600/30 text-white"
               required
             />
           </div>

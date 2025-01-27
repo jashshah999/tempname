@@ -7,7 +7,7 @@
 }
 
 body {
-  @apply bg-black text-gray-100 min-h-screen;
+  @apply bg-neutral-900 text-gray-100 min-h-screen;
 }
 
 /* Base animations */
@@ -27,8 +27,8 @@ body {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(14, 165, 233, 0.2); }
-  50% { box-shadow: 0 0 30px rgba(14, 165, 233, 0.4); }
+  0%, 100% { box-shadow: 0 0 20px rgba(22, 163, 74, 0.2); }
+  50% { box-shadow: 0 0 30px rgba(22, 163, 74, 0.3); }
 }
 
 /* Animate elements on page load */
@@ -51,7 +51,7 @@ body {
 .feature-card:nth-child(3) { animation-delay: 0.3s; }
 
 .feature-card:hover {
-  @apply border-sky-500/40;
+  @apply border-green-600/30;
   transform: translateY(-2px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
@@ -74,26 +74,24 @@ body {
 }
 
 .glass {
-  @apply bg-black/80 backdrop-blur-lg border border-sky-500/20;
-  animation: scaleIn 0.5s ease-out;
+  @apply bg-neutral-800/80 backdrop-blur-lg;
 }
 
 .glass-card {
-  @apply bg-black/40 backdrop-blur-xl 
-    border border-sky-500/20 rounded-xl
+  @apply bg-neutral-800/40 backdrop-blur-xl 
     shadow-xl shadow-black/10;
 }
 
 .glass-card:hover {
-  @apply border-sky-500/30;
+  @apply border-green-600/30;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
 
 .btn-primary {
   @apply inline-flex items-center justify-center px-4 py-2 rounded-lg
-    bg-sky-500 text-white font-medium
-    hover:bg-sky-600 
-    focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:ring-offset-2 focus:ring-offset-black
+    bg-green-600 text-white font-medium
+    hover:bg-green-600 
+    focus:outline-none focus:ring-2 focus:ring-green-600/50 focus:ring-offset-2 focus:ring-offset-gray-900
     disabled:opacity-50 disabled:cursor-not-allowed
     transition-all duration-200 ease-in-out
     text-sm;
@@ -101,10 +99,10 @@ body {
 
 .btn-secondary {
   @apply inline-flex items-center justify-center px-4 py-2 rounded-lg
-    bg-transparent text-sky-500 font-medium
-    border border-sky-500/20
-    hover:bg-sky-500/10 hover:border-sky-500/30
-    focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:ring-offset-2 focus:ring-offset-black
+    bg-transparent text-green-600 font-medium
+    border border-neutral-700
+    hover:bg-green-600/10
+    focus:outline-none focus:ring-2 focus:ring-green-600/50 focus:ring-offset-2 focus:ring-offset-neutral-900
     disabled:opacity-50 disabled:cursor-not-allowed
     transition-all duration-200 ease-in-out
     text-sm;
@@ -122,24 +120,24 @@ body {
 }
 
 .feature-icon {
-  @apply relative rounded-xl p-3 bg-sky-500/10;
+  @apply relative rounded-xl p-3 bg-green-600/10;
   animation: pulse-glow 2s infinite;
 }
 
 .feature-icon svg {
-  @apply text-sky-500 transition-all duration-300;
+  @apply text-green-600 transition-all duration-300;
 }
 
 .feature-card:hover .feature-icon svg {
-  @apply text-sky-400;
+  @apply text-green-600;
 }
 
 .logo-icon {
-  @apply relative p-2 rounded-xl bg-sky-500/10;
+  @apply relative p-2 rounded-xl bg-green-600/10;
 }
 
 .logo-icon svg {
-  @apply text-sky-500;
+  @apply text-green-600;
 }
 
 .logo-text {
@@ -147,7 +145,7 @@ body {
 }
 
 .upload-option-card {
-  @apply glass-card p-6 rounded-xl flex flex-col items-center text-center transition-all duration-300 hover:border-sky-500/40;
+  @apply glass-card p-6 rounded-xl flex flex-col items-center text-center transition-all duration-300 hover:border-green-600/40;
   animation: scaleIn 0.5s ease-out;
 }
 
@@ -157,19 +155,19 @@ body {
 }
 
 .upload-option-card svg {
-  @apply text-sky-500;
+  @apply text-green-600;
 }
 
 .dashboard-stat {
-  @apply text-2xl font-bold text-sky-500;
+  @apply text-2xl font-bold text-green-600;
 }
 
 .progress-bar {
-  @apply bg-gray-800 rounded-full overflow-hidden;
+  @apply bg-neutral-700 rounded-full overflow-hidden;
 }
 
 .progress-bar-fill {
-  @apply bg-sky-500 h-2 rounded-full transition-all duration-500;
+  @apply bg-green-600 h-2 rounded-full transition-all duration-500;
 }
 
 ::-webkit-scrollbar {
@@ -177,15 +175,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-black;
+  @apply bg-neutral-900;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-sky-900 rounded-full hover:bg-sky-800 transition-colors;
+  @apply bg-neutral-700 rounded-full hover:bg-neutral-600 transition-colors;
 }
 
 /* Modal animations */
 .modal-overlay {
+  @apply bg-neutral-900/90;
   animation: fadeIn 0.3s ease-out;
 }
 
@@ -236,11 +235,10 @@ body {
 
 /* Add consistent input styles */
 .input-primary {
-  @apply w-full px-4 py-2 bg-black/30 
-    border border-sky-500/20 rounded-lg
+  @apply w-full px-4 py-2 bg-neutral-800/30 
+    border border-neutral-700 rounded-lg
     text-white placeholder-gray-500
-    focus:outline-none focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/50
-    transition-all duration-200 ease-in-out;
+    focus:outline-none focus:border-green-600/50 focus:ring-1 focus:ring-green-600/50;
 }
 
 /* Email content styles */
@@ -255,32 +253,32 @@ body {
 }
 
 .email-content img[data-action="zoom"] {
-  @apply hover:scale-[1.02] cursor-zoom-in hover:shadow-lg hover:shadow-sky-500/10;
+  @apply hover:scale-[1.02] cursor-zoom-in hover:shadow-lg hover:shadow-green-500/10;
 }
 
 .email-content a {
-  @apply text-sky-500 hover:text-sky-400 underline decoration-sky-500/30 hover:decoration-sky-400;
+  @apply text-green-600 hover:text-green-500 underline decoration-green-600/30 hover:decoration-green-500;
 }
 
 .email-content blockquote {
-  @apply border-l-4 border-sky-500/20 pl-4 my-6 text-gray-400 italic;
+  @apply border-l-4 border-green-600/20 pl-4 my-6 text-gray-400 italic;
 }
 
 .email-content table {
-  @apply border-collapse w-full my-6 bg-black/20;
+  @apply border-collapse w-full my-6 bg-neutral-800/20;
 }
 
 .email-content th {
-  @apply bg-sky-500/10 text-sky-400 font-medium;
+  @apply bg-green-600/10 text-green-600 font-medium;
 }
 
 .email-content th,
 .email-content td {
-  @apply border border-gray-800 p-3 text-sm;
+  @apply border border-neutral-700 p-3 text-sm;
 }
 
 .email-content pre {
-  @apply bg-black/50 p-4 rounded-lg overflow-x-auto my-6 text-sm font-mono;
+  @apply bg-neutral-900/50 p-4 rounded-lg overflow-x-auto my-6 text-sm font-mono;
 }
 
 /* Animation for email modal */
@@ -367,9 +365,7 @@ body {
 
 .split-handle:hover::after,
 .split-handle.dragging::after {
-  @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-    w-1 h-24 bg-sky-500/20 rounded-full;
-  content: '';
+  @apply bg-green-600/20;
 }
 
 /* Prevent text selection while dragging */

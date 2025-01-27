@@ -89,12 +89,12 @@ export function Dashboard({ files, onUploadClick, onDeleteComplete, onFileView, 
               <p className="dashboard-stat">{localFiles.length}</p>
             </div>
             <div className="feature-icon">
-              <FileText className="h-6 w-6" />
+              <FileText className="text-green-600 h-6 w-6" />
             </div>
           </div>
           <div className="mt-4">
             <div className="progress-bar">
-              <div className="progress-bar-fill" style={{ width: '70%' }}></div>
+              <div className="progress-bar-fill bg-green-600/80" style={{ width: '70%' }}></div>
             </div>
           </div>
         </div>
@@ -106,12 +106,12 @@ export function Dashboard({ files, onUploadClick, onDeleteComplete, onFileView, 
               <p className="dashboard-stat">85%</p>
             </div>
             <div className="feature-icon">
-              <PieChart className="h-6 w-6" />
+              <PieChart className="text-green-600 h-6 w-6" />
             </div>
           </div>
           <div className="mt-4">
             <div className="progress-bar">
-              <div className="progress-bar-fill" style={{ width: '85%' }}></div>
+              <div className="progress-bar-fill bg-green-600/80" style={{ width: '85%' }}></div>
             </div>
           </div>
         </div>
@@ -123,12 +123,12 @@ export function Dashboard({ files, onUploadClick, onDeleteComplete, onFileView, 
               <p className="dashboard-stat">60%</p>
             </div>
             <div className="feature-icon">
-              <BarChart3 className="h-6 w-6" />
+              <BarChart3 className="text-green-600 h-6 w-6" />
             </div>
           </div>
           <div className="mt-4">
             <div className="progress-bar">
-              <div className="progress-bar-fill" style={{ width: '60%' }}></div>
+              <div className="progress-bar-fill bg-green-600/80" style={{ width: '60%' }}></div>
             </div>
           </div>
         </div>
@@ -147,12 +147,12 @@ export function Dashboard({ files, onUploadClick, onDeleteComplete, onFileView, 
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="glass p-4 rounded-lg border-dashed border-2 border-sky-500/30 hover:border-sky-500/50 transition-colors">
-            <p className="text-sky-500 font-medium mb-2">Excel Documents</p>
+          <div className="glass p-4 rounded-lg border-dashed border-2 border-green-600/20 hover:border-green-500/50 transition-colors">
+            <p className="text-green-600 font-medium mb-2">Excel Documents</p>
             <p className="text-gray-400 text-sm">Upload Excel files for processing</p>
           </div>
-          <div className="glass p-4 rounded-lg border-dashed border-2 border-sky-500/30 hover:border-sky-500/50 transition-colors">
-            <p className="text-sky-500 font-medium mb-2">PDF Documents</p>
+          <div className="glass p-4 rounded-lg border-dashed border-2 border-green-600/20 hover:border-green-500/50 transition-colors">
+            <p className="text-green-600 font-medium mb-2">PDF Documents</p>
             <p className="text-gray-400 text-sm">Upload PDF files for reference</p>
           </div>
         </div>
@@ -180,7 +180,7 @@ export function Dashboard({ files, onUploadClick, onDeleteComplete, onFileView, 
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-800">
+              <tr className="border-b border-neutral-700">
                 <th className="text-left py-3 text-gray-400 font-medium w-2/5">File Name</th>
                 <th className="text-left py-3 text-gray-400 font-medium w-1/5">Type</th>
                 <th className="text-left py-3 text-gray-400 font-medium w-1/5">Upload Date</th>
@@ -190,7 +190,7 @@ export function Dashboard({ files, onUploadClick, onDeleteComplete, onFileView, 
             </thead>
             <tbody>
               {localFiles.map((file, index) => (
-                <tr key={index} className="border-b border-gray-800/50 hover:bg-yellow-500/5">
+                <tr key={index} className="border-b border-neutral-700/50 hover:bg-yellow-500/5">
                   <td className="py-3 text-white">
                     <div className="max-w-xs truncate pr-4" title={file.name}>
                       {truncateFileName(file.name)}

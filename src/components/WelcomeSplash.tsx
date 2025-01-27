@@ -21,7 +21,7 @@ export function WelcomeSplash({ onComplete }: WelcomeSplashProps) {
 
   return (
     <div
-      className={`fixed inset-0 bg-black flex items-center justify-center transition-opacity duration-1000 z-50 ${
+      className={`fixed inset-0 bg-neutral-900 flex items-center justify-center transition-opacity duration-1000 z-50 ${
         isAnimating ? 'opacity-100' : 'opacity-0'
       }`}
     >
@@ -41,7 +41,7 @@ export function WelcomeSplash({ onComplete }: WelcomeSplashProps) {
         <h1 className="text-4xl font-bold text-white mb-4 animate-fade-in">
           Welcome to MSME Flow
         </h1>
-        <p className="text-sky-500 text-xl animate-fade-in-delay">
+        <p className="text-green-700 text-xl animate-fade-in-delay">
           Empowering Business Growth
         </p>
       </div>
