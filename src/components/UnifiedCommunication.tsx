@@ -113,6 +113,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
   const [hasMore, setHasMore] = useState(true);
   const [splitPosition, setSplitPosition] = useState(50); // Percentage
   const [isDragging, setIsDragging] = useState(false);
+  const [backendMessage, setBackendMessage] = useState<string>('');
 
   // Check if user is already authenticated with Google
   useEffect(() => {
@@ -938,16 +939,36 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
     };
   }, [isDragging]);
 
+  // Add the fetch useEffect
+  useEffect(() => {
+    const fetchBackendMessage = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/test');
+        const data = await response.json();
+        setBackendMessage(data.message);
+      } catch (error) {
+        console.error('Error fetching from backend:', error);
+      }
+    };
+
+    fetchBackendMessage();
+  }, []);
+
   return (
     <div className="min-h-screen bg-neutral-900">
       {/* Top Navigation Bar */}
       <div className="bg-neutral-800/50 px-4 py-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between relative">
           <div className="flex items-center space-x-3">
             <div className="logo-icon">
               <Workflow className="h-6 w-6" />
             </div>
             <span className="text-lg font-bold text-white">MSME Flow</span>
+            {backendMessage && (
+              <div className="ml-4 px-3 py-1 bg-green-600/10 rounded-full text-green-500">
+                {backendMessage}
+              </div>
+            )}
           </div>
           <div className="flex items-center space-x-4">
             <button

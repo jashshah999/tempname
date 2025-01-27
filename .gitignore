@@ -72,3 +72,8 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+
+# Backend
+/backend/venv/
+/backend/__pycache__/
+*.pyc
