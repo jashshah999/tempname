@@ -77,3 +77,4 @@ $RECYCLE.BIN/
 /backend/venv/
 /backend/__pycache__/
 *.pyc
+.venv

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import axios from 'axios';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -18,7 +19,7 @@ export function LoginModal({ isOpen, onClose, onSignUpClick }: LoginModalProps) 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
       setError('Please connect to Supabase first using the "Connect to Supabase" button.');
       return;
@@ -44,21 +45,8 @@ export function LoginModal({ isOpen, onClose, onSignUpClick }: LoginModalProps) 
 
   const handleGoogleLogin = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent'
-          }
-        }
-      });
-
-      if (error) throw error;
-      if (data.url) {
-        window.location.href = data.url;
-      }
+      const backendUrl = !import.meta.env.VITE_BACKEND_URL ? 'http://localhost:8000' : import.meta.env.VITE_BACKEND_URL;
+      window.location.href = `${backendUrl}/api/authentication/google`
     } catch (err: any) {
       setError(err.message);
     }
@@ -73,9 +61,9 @@ export function LoginModal({ isOpen, onClose, onSignUpClick }: LoginModalProps) 
         >
           <X size={20} />
         </button>
-        
+
         <h2 className="text-2xl font-bold mb-6 text-white">Login to Your Account</h2>
-        
+
         {error && (
           <div className="bg-red-900/50 text-red-200 p-3 rounded mb-4 border border-red-500/20">
             {error}

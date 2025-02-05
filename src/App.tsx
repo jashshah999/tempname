@@ -41,12 +41,18 @@ export default function App() {
   const [showWelcome, setShowWelcome] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user || null);
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error('Error getting session:', error);
+        return;
+      }
+      if (session?.user) {
+        setUser(session?.user);
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
+      setUser(session?.user);
     });
 
     return () => subscription.unsubscribe();
@@ -60,7 +66,7 @@ export default function App() {
 
   const loadUserFiles = async () => {
     if (isLoadingFiles) return;
-    
+
     try {
       setIsLoadingFiles(true);
 
@@ -287,15 +293,15 @@ export default function App() {
 
             {user ? (
               showDashboard ? (
-                <Dashboard 
-                  files={uploadedFiles} 
+                <Dashboard
+                  files={uploadedFiles}
                   onUploadClick={() => setShowUploader(true)}
                   onDeleteComplete={handleDeleteComplete}
                   onFileView={(file) => setSelectedFile(file)}
                   onFileUpdate={handleFileUpdate}
                 />
               ) : (
-                <QuoteGenerator 
+                <QuoteGenerator
                   onUploadClick={() => setShowUploader(true)}
                   onViewExcel={(file) => setSelectedFile(file)}
                 />
@@ -372,7 +378,7 @@ export default function App() {
         )}
 
         {/* Modals */}
-        <LoginModal 
+        <LoginModal
           isOpen={isLoginOpen}
           onClose={() => setIsLoginOpen(false)}
           onSignUpClick={() => {
@@ -389,7 +395,7 @@ export default function App() {
           }}
         />
         {showUploader && (
-          <FileUploader 
+          <FileUploader
             onUploadComplete={handleUploadComplete}
             onCancel={() => setShowUploader(false)}
           />
