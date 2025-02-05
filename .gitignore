@@ -78,3 +78,4 @@ $RECYCLE.BIN/
 /backend/__pycache__/
 *.pyc
 .venv
+wa_credentials

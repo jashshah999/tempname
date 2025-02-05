@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { supabase } from '../lib/supabase';
-import { Loader2 } from 'lucide-react';
 
 export function AuthCallback() {
   const [error, setError] = useState<string | null>(null);
@@ -36,23 +35,8 @@ export function AuthCallback() {
       </div>
     ) :
       (
-        <div className="min-h-screen flex flex-col items-center justify-center">
-          <div className="relative p-12">
-            <div className="absolute -inset-2 bg-green-600/20 rounded-full blur-xl animate-pulse" />
-            <div>
-              <Loader2
-                className="text-green-500 w-16 h-16 animate-spin relative"
-                strokeWidth={1.5}
-              />
-            </div>
-          </div>
-
-          {/* Loading text with animations */}
-          <div className="mt-8 flex flex-col items-center animate-fade-in">
-            <p className="text-green-500 text-xl font-light tracking-wider">
-              LOADING
-            </p>
-          </div>
+        <div className="flex items-center justify-center h-full">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
         </div>
       )
   );

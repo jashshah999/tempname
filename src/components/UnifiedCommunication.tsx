@@ -66,7 +66,7 @@ function ImageViewer({ src, onClose }: ImageViewerProps) {
   return (
     <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center" onClick={onClose}>
       <div className="absolute top-4 right-4 flex gap-2">
-        <button 
+        <button
           onClick={(e) => {
             e.stopPropagation();
             setZoomed(!zoomed);
@@ -75,15 +75,15 @@ function ImageViewer({ src, onClose }: ImageViewerProps) {
         >
           {zoomed ? <ZoomOut className="h-5 w-5" /> : <ZoomIn className="h-5 w-5" />}
         </button>
-        <button 
+        <button
           onClick={onClose}
           className="p-2 rounded-full bg-gray-800/50 hover:bg-gray-800 text-gray-400 hover:text-white"
         >
           <X className="h-5 w-5" />
         </button>
       </div>
-      <img 
-        src={src} 
+      <img
+        src={src}
         alt="Full size preview"
         className={`max-h-[90vh] ${zoomed ? 'max-w-none' : 'max-w-[90vw]'} rounded-lg`}
         onClick={(e) => e.stopPropagation()}
@@ -209,7 +209,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
 
   const fetchEmails = async () => {
     if (!isConfigured.email) return;
-    
+
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -225,7 +225,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
             'Authorization': `Bearer ${session.provider_token}`
           }
         });
-        
+
         if (!testResponse.ok) {
           const errorData = await testResponse.json();
           console.error('Gmail API error:', errorData);
@@ -251,7 +251,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
 
       const data = await response.json();
       console.log('Messages data:', data); // Debug log
-      
+
       if (!data.messages || !Array.isArray(data.messages)) {
         console.error('Unexpected response format:', data);
         return;
@@ -262,10 +262,10 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
         data.messages.map(async (message: { id: string }) => {
           const detailResponse = await fetch(
             `https://www.googleapis.com/gmail/v1/users/me/messages/${message.id}`, {
-              headers: {
-                'Authorization': `Bearer ${session.provider_token}`
-              }
+            headers: {
+              'Authorization': `Bearer ${session.provider_token}`
             }
+          }
           );
 
           if (!detailResponse.ok) {
@@ -275,13 +275,13 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
 
           const detail = await detailResponse.json();
           console.log('Message detail:', detail); // Debug log
-          
+
           // Parse email details
           const headers = detail.payload?.headers || [];
           const subject = headers.find((h: any) => h.name === 'Subject')?.value || 'No Subject';
           const from = headers.find((h: any) => h.name === 'From')?.value || '';
           const date = headers.find((h: any) => h.name === 'Date')?.value || '';
-          
+
           return {
             id: message.id,
             subject,
@@ -341,7 +341,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
     setEmailState(prev => ({ ...prev, searchQuery: query }));
     // Filter emails based on search query
     if (query) {
-      const filtered = emails.filter(email => 
+      const filtered = emails.filter(email =>
         email.subject.toLowerCase().includes(query.toLowerCase()) ||
         email.from.toLowerCase().includes(query.toLowerCase()) ||
         email.snippet.toLowerCase().includes(query.toLowerCase())
@@ -354,7 +354,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
 
   const handleSendEmail = async (email: typeof emailState.composing) => {
     if (!email) return;
-    
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.provider_token) return;
@@ -396,10 +396,10 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
   // Add this function to load more emails
   const loadMoreEmails = async () => {
     if (!hasMore || loading) return;
-    
+
     const nextPage = page + 1;
     const pageSize = 20;
-    
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.provider_token) return;
@@ -424,10 +424,10 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
         data.messages.map(async (message: { id: string }) => {
           const detailResponse = await fetch(
             `https://www.googleapis.com/gmail/v1/users/me/messages/${message.id}`, {
-              headers: {
-                'Authorization': `Bearer ${session.provider_token}`
-              }
+            headers: {
+              'Authorization': `Bearer ${session.provider_token}`
             }
+          }
           );
 
           if (!detailResponse.ok) {
@@ -437,13 +437,13 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
 
           const detail = await detailResponse.json();
           console.log('Message detail:', detail); // Debug log
-          
+
           // Parse email details
           const headers = detail.payload?.headers || [];
           const subject = headers.find((h: any) => h.name === 'Subject')?.value || 'No Subject';
           const from = headers.find((h: any) => h.name === 'From')?.value || '';
           const date = headers.find((h: any) => h.name === 'Date')?.value || '';
-          
+
           return {
             id: message.id,
             subject,
@@ -469,10 +469,10 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
 
       const response = await fetch(
         `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}?format=full`, {
-          headers: {
-            'Authorization': `Bearer ${session.provider_token}`
-          }
+        headers: {
+          'Authorization': `Bearer ${session.provider_token}`
         }
+      }
       );
 
       if (!response.ok) return null;
@@ -536,10 +536,10 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
 
       const response = await fetch(
         `https://www.googleapis.com/gmail/v1/users/me/messages/${messageId}/attachments/${attachment.attachmentId}`, {
-          headers: {
-            'Authorization': `Bearer ${session.provider_token}`
-          }
+        headers: {
+          'Authorization': `Bearer ${session.provider_token}`
         }
+      }
       );
 
       if (!response.ok) throw new Error('Failed to fetch attachment');
@@ -666,9 +666,9 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
               {/* Email Body */}
               <div className="bg-gray-900/50 rounded-xl p-8 mb-8">
                 {emailState.selectedEmail.bodyHtml ? (
-                  <div 
+                  <div
                     className="email-content prose prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{ 
+                    dangerouslySetInnerHTML={{
                       __html: DOMPurify.sanitize(
                         processHtmlContent(emailState.selectedEmail.bodyHtml),
                         {
@@ -712,14 +712,14 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
             <span className="text-white">{userEmail}</span>
           </div>
           <div className="flex items-center space-x-4">
-            <button 
+            <button
               onClick={handleComposeNew}
               className="btn-primary flex items-center space-x-2"
             >
               <Plus className="h-4 w-4" />
               <span>Compose</span>
             </button>
-            <button 
+            <button
               onClick={async () => {
                 await supabase.auth.signOut();
                 setIsConfigured(prev => ({ ...prev, email: false }));
@@ -746,130 +746,136 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
         </div>
 
         {/* Email Content Area */}
-        <div className="bg-neutral-800/30 rounded-lg border border-green-600/20 overflow-hidden">
-          {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-            </div>
-          ) : emailState.view === 'compose' ? (
-            <div className="p-4">
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="To"
-                  value={emailState.composing?.to || ''}
-                  onChange={(e) => setEmailState(prev => ({
-                    ...prev,
-                    composing: { ...prev.composing!, to: e.target.value }
-                  }))}
-                  className="input-primary"
-                />
-                <input
-                  type="text"
-                  placeholder="CC"
-                  value={emailState.composing?.cc || ''}
-                  onChange={(e) => setEmailState(prev => ({
-                    ...prev,
-                    composing: { ...prev.composing!, cc: e.target.value }
-                  }))}
-                  className="input-primary"
-                />
-                <input
-                  type="text"
-                  placeholder="BCC"
-                  value={emailState.composing?.bcc || ''}
-                  onChange={(e) => setEmailState(prev => ({
-                    ...prev,
-                    composing: { ...prev.composing!, bcc: e.target.value }
-                  }))}
-                  className="input-primary"
-                />
-                <input
-                  type="text"
-                  placeholder="Subject"
-                  value={emailState.composing?.subject || ''}
-                  onChange={(e) => setEmailState(prev => ({
-                    ...prev,
-                    composing: { ...prev.composing!, subject: e.target.value }
-                  }))}
-                  className="input-primary"
-                />
-                <textarea
-                  placeholder="Message"
-                  value={emailState.composing?.body || ''}
-                  onChange={(e) => setEmailState(prev => ({
-                    ...prev,
-                    composing: { ...prev.composing!, body: e.target.value }
-                  }))}
-                  className="input-primary h-64 px-3 py-2 bg-neutral-900/30 border border-green-600/20 rounded text-white resize-none"
-                />
-                <div className="flex justify-end space-x-3">
-                  <button
-                    onClick={() => setEmailState(prev => ({ ...prev, view: 'list', composing: null }))}
-                    className="btn-secondary"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={() => handleSendEmail(emailState.composing)}
-                    className="btn-primary"
-                  >
-                    <Send className="h-4 w-4 mr-2" />
-                    Send
-                  </button>
+        <div className="h-full flex flex-col">
+          <div className="overflow-hidden flex-grow flex flex-col min-h-0">
+            {loading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+              </div>
+            ) : emailState.view === 'compose' ? (
+              <div className="p-4 overflow-y-auto bg-neutral-800/30 rounded-lg border border-green-600/20">
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    placeholder="To"
+                    value={emailState.composing?.to || ''}
+                    onChange={(e) => setEmailState(prev => ({
+                      ...prev,
+                      composing: { ...prev.composing!, to: e.target.value }
+                    }))}
+                    className="input-primary"
+                  />
+                  <input
+                    type="text"
+                    placeholder="CC"
+                    value={emailState.composing?.cc || ''}
+                    onChange={(e) => setEmailState(prev => ({
+                      ...prev,
+                      composing: { ...prev.composing!, cc: e.target.value }
+                    }))}
+                    className="input-primary"
+                  />
+                  <input
+                    type="text"
+                    placeholder="BCC"
+                    value={emailState.composing?.bcc || ''}
+                    onChange={(e) => setEmailState(prev => ({
+                      ...prev,
+                      composing: { ...prev.composing!, bcc: e.target.value }
+                    }))}
+                    className="input-primary"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Subject"
+                    value={emailState.composing?.subject || ''}
+                    onChange={(e) => setEmailState(prev => ({
+                      ...prev,
+                      composing: { ...prev.composing!, subject: e.target.value }
+                    }))}
+                    className="input-primary"
+                  />
+                  <textarea
+                    placeholder="Message"
+                    value={emailState.composing?.body || ''}
+                    onChange={(e) => setEmailState(prev => ({
+                      ...prev,
+                      composing: { ...prev.composing!, body: e.target.value }
+                    }))}
+                    className="input-primary h-64 px-3 py-2 bg-neutral-900/30 border border-green-600/20 rounded text-white resize-none"
+                  />
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      onClick={() => setEmailState(prev => ({ ...prev, view: 'list', composing: null }))}
+                      className="btn-secondary"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => handleSendEmail(emailState.composing)}
+                      className="btn-primary"
+                    >
+                      <Send className="h-4 w-4 mr-2" />
+                      Send
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className="divide-y divide-green-600/10 overflow-y-auto h-full">
-              {emails.map((email) => (
-                <div 
-                  key={email.id}
-                  className={`p-4 hover:bg-green-600/5 cursor-pointer ${
-                    email.unread ? 'bg-green-600/10' : ''
-                  }`}
-                  onClick={async () => {
-                    const emailData = await fetchEmailDetail(email.id);
-                    setEmailState(prev => ({
-                      ...prev,
-                      view: 'detail',
-                      selectedEmail: { ...email, ...emailData }
-                    }));
-                  }}
-                >
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="text-white font-medium">{email.from}</span>
-                    <span className="text-gray-400 text-sm">{email.date}</span>
-                  </div>
-                  <div className="text-white mb-1">{email.subject}</div>
-                  <div className="text-gray-400 text-sm truncate">{email.snippet}</div>
+            ) : (
+              <div className="flex flex-col h-[96%] min-h-0 justify-between">
+                <div className={`h-${hasMore ? "[85%]" : "full"} divide-y divide-green-600/10 overflow-y-auto flex-grow bg-neutral-800/30 rounded-md border border-green-600/20`}>
+                  {emails.map((email) => (
+                    <div
+                      key={email.id}
+                      className={`p-4 hover:bg-green-600/5 cursor-pointer ${email.unread ? 'bg-green-600/10' : ''
+                        }`}
+                      onClick={async () => {
+                        const emailData = await fetchEmailDetail(email.id);
+                        setEmailState(prev => ({
+                          ...prev,
+                          view: 'detail',
+                          selectedEmail: { ...email, ...emailData }
+                        }));
+                      }}
+                    >
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="text-white font-medium">{email.from}</span>
+                        <span className="text-gray-400 text-sm">{email.date}</span>
+                      </div>
+                      <div className="text-white mb-1">{email.subject}</div>
+                      <div className="text-gray-400 text-sm truncate">{email.snippet}</div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-              
-              {hasMore && (
-                <button
-                  onClick={loadMoreEmails}
-                  className="btn-secondary w-full"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <span className="flex items-center justify-center">
-                      <Loader className="h-4 w-4 animate-spin mr-2" />
-                      Loading...
-                    </span>
-                  ) : (
-                    <span className="flex items-center justify-center">
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Load More
-                    </span>
-                  )}
-                </button>
-              )}
-            </div>
-          )}
+
+                {hasMore && (
+                  <div className="h-[15%] flex-shrink-0 border-t border-green-600/10 py-2">
+                    <button
+                      onClick={loadMoreEmails}
+                      className="btn-secondary w-full rounded-none"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <span className="flex items-center justify-center">
+                          <Loader className="h-4 w-4 animate-spin mr-2" />
+                          Loading...
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center">
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                          Load More
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
+
   };
 
   const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
@@ -880,7 +886,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
 
   const processHtmlContent = (html: string) => {
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    
+
     // Process images to make them clickable
     doc.querySelectorAll('img').forEach(img => {
       img.classList.add('cursor-zoom-in', 'hover:opacity-90', 'transition-opacity');
@@ -913,14 +919,14 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
 
   const handleDrag = (e: MouseEvent) => {
     if (!isDragging) return;
-    
+
     const container = document.getElementById('split-container');
     if (!container) return;
-    
+
     const containerRect = container.getBoundingClientRect();
     const containerWidth = containerRect.width;
     const mouseX = e.clientX - containerRect.left;
-    
+
     // Calculate percentage (constrain between 20% and 80%)
     const newPosition = Math.min(Math.max((mouseX / containerWidth) * 100, 20), 80);
     setSplitPosition(newPosition);
@@ -932,7 +938,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
       window.addEventListener('mousemove', handleDrag);
       window.addEventListener('mouseup', handleDragEnd);
     }
-    
+
     return () => {
       window.removeEventListener('mousemove', handleDrag);
       window.removeEventListener('mouseup', handleDragEnd);
@@ -980,7 +986,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
               <LogOut className="h-4 w-4" />
               <span>Sign Out</span>
             </button>
-            <button 
+            <button
               onClick={onClose}
               className="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800/50"
             >
@@ -991,13 +997,13 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
       </div>
 
       {/* Split View Container */}
-      <div 
+      <div
         id="split-container"
         className="h-[calc(100vh-4rem)] flex relative"
         style={{ cursor: isDragging ? 'col-resize' : 'auto' }}
       >
         {/* Email Section */}
-        <div 
+        <div
           className="h-full border-r border-neutral-700 overflow-hidden"
           style={{ width: `${splitPosition}%` }}
         >
@@ -1024,7 +1030,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
         {/* Draggable Divider */}
         <div
           className="absolute h-full w-1 cursor-col-resize group"
-          style={{ 
+          style={{
             left: `${splitPosition}%`,
             transform: 'translateX(-50%)',
           }}
@@ -1043,7 +1049,7 @@ export function UnifiedCommunication({ onClose }: UnifiedCommunicationProps) {
         </div>
 
         {/* WhatsApp Section */}
-        <div 
+        <div
           className="h-full overflow-hidden"
           style={{ width: `${100 - splitPosition}%` }}
         >
