@@ -1,6 +1,8 @@
 import base64
 import hashlib
+import json
 import os
+import urllib.parse
 
 from fastapi import HTTPException
 from supabase import create_client, Client, ClientOptions
@@ -96,15 +98,19 @@ class SupabaseOperations:
         return code_challenge.rstrip("=")  # Remove padding
 
 
-    def google_sign_in(self):
+    def google_sign_in(self, from_chrom_ext):
         code_verifier = self.generate_code_verifier()
         self.client.auth._storage.set_item("code_verifier", code_verifier)
+        if from_chrom_ext:
+            redirect_url = f"{FRONTEND_URL}/auth/callback?from_chrome_ext={from_chrom_ext}"
+        else:
+            redirect_url = f"{FRONTEND_URL}/auth/callback"
         auth_url = self.client.auth.sign_in_with_oauth({
             'provider': 'google',
             'options': {
-                'redirect_to': f"{FRONTEND_URL}/auth/callback",
+                'redirect_to': redirect_url,
                 'code_challenge': self.generate_code_challenge(code_verifier),
-                'code_challenge_method': 'S256',
+                'code_challenge_method': 'S256'
             }
         })
         return auth_url

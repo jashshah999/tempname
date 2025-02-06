@@ -33,7 +33,7 @@ export function Dashboard({ files, onUploadClick, onDeleteComplete, onFileView, 
       setDeleteError('Invalid file path');
       return;
     }
-    
+
     try {
       setDeletingFileId(filePath);
       setIsDeleting(true);
@@ -54,7 +54,7 @@ export function Dashboard({ files, onUploadClick, onDeleteComplete, onFileView, 
 
       // Notify parent component to refresh the file list
       await onDeleteComplete();
-      
+
     } catch (err: any) {
       console.error('Delete error:', err);
       setDeleteError(err.message || 'Error deleting file');
@@ -138,7 +138,7 @@ export function Dashboard({ files, onUploadClick, onDeleteComplete, onFileView, 
       <div className="dashboard-card mb-8">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold text-white">Add More Files</h3>
-          <button 
+          <button
             className="btn-secondary inline-flex items-center"
             onClick={onUploadClick}
           >
@@ -201,16 +201,15 @@ export function Dashboard({ files, onUploadClick, onDeleteComplete, onFileView, 
                   <td className="py-3 text-gray-400">{file.size}</td>
                   <td className="py-3 text-right">
                     <div className="flex items-center justify-end space-x-4">
-                      <button 
+                      <button
                         className="text-yellow-500 hover:text-yellow-400 inline-flex items-center"
                         onClick={() => handleFileView(file)}
                       >
                         <Eye className="h-4 w-4" />
                       </button>
                       <button
-                        className={`text-red-500 hover:text-red-400 inline-flex items-center ${
-                          isDeleting && deletingFileId === file.path ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
+                        className={`text-red-500 hover:text-red-400 inline-flex items-center ${isDeleting && deletingFileId === file.path ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
                         onClick={() => handleFileDelete(file.path)}
                         disabled={isDeleting && deletingFileId === file.path}
                       >
