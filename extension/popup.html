@@ -56,68 +56,77 @@
     <!-- Main Content -->
     <div id="mainContent" class="container" style="display: none;">
 
-      <div class="dashboard-card" style="display: none;">
-        <h3>Add Excel Files</h3>
-        <div class="upload-container">
-          <p>Upload Excel files for processing</p>
-          <svg class="upload-icon" viewBox="0 0 24 24">
-            <path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z"/>
+      <!-- Price List Upload -->
+      <div id="priceListUpload" class="dashboard-card">
+        <h3>Upload Price List</h3>
+        <div class="upload-container" id="priceList">
+          <svg class="upload-icon" viewBox="0 0 24 24" width="48" height="48">
+            <path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z" fill="#666" />
           </svg>
-          <!-- <label for="excelUpload" class="custom-file-label">Upload File</label> -->
-          <input type="file" id="excelUpload" accept=".xls,.xlsx" />
+          <br />
+          <label for="priceListInput" id="priceListCustomField" class="custom-file-label">Drag &amp; Drop or Click to
+            Upload Files</label>
+          <input type="file" id="priceListInput" accept=".xls,.xlsx" multiple style="display: none;" />
         </div>
         <div class="actions mt-2">
-        <button id="uploadExcel" class="btn-secondary ">
-          Next
-        </button>
+          <button id="uploadPriceList" class="btn-secondary">Next</button>
         </div>
+        <div id="priceListUploadError" class="error-message"></div>
       </div>
-  
-  
-      <div class="dashboard-card" style="display: none;">
-        <h3 class="text-lg font-semibold text-green-600 mb-4">Choose Input Method</h3>
-        <div class="flex flex-col sm:flex-row gap-4 items-center">
-          <div class="flex-1 w-full">
-            <textarea placeholder="Enter product details, specifications, and requirements..."></textarea>
-          </div>
-          <div class="text-green-600 font-medium">OR</div>
-          <div class="flex-1 w-full">
-            <button class="btn-sec">
-              <div class="text-center">
-                <svg class="upload-icon" viewBox="0 0 24 24">
-                  <path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z"/>
-                </svg>
-                <!-- <span>Upload File</span> -->
-              </div>
-            </button>
-          </div>
+
+      <!-- Quotation Upload -->
+      <div id="quotationUpload" class="dashboard-card">
+        <h3>Upload Quotation Files</h3>
+        <div class="upload-container" id="quotation">
+          <svg class="upload-icon" viewBox="0 0 24 24" width="48" height="48">
+            <path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z" fill="#666" />
+          </svg>
+          <br />
+          <label for="quotationInput" id="quotationCustomField" class="custom-file-label">Drag &amp; Drop or Click to
+            Upload Files</label>
+          <input type="file" id="quotationInput" accept=".xls,.xlsx" multiple style="display: none;" />
         </div>
         <div class="actions mt-2">
-        <button id="uploadQuota" class="btn-secondary">
-          Submit
-        </button>
-      </div>
-      </div>
-      
-      <div class="header">
-        <h2>Quote Generator</h2>
-        <button id="settingsBtn" class="btn-secondary">Settings</button>
+          <button id="uploadQuotation" class="btn-secondary">Submit</button>
+        </div>
+        <div id="quotationUploadError" class="error-message"></div>
       </div>
 
-      <div class="actions">
-        <button id="generateQuoteBtn" class="btn-secondary">
-          <span class="icon">📝</span>
-          Generate Quote
-        </button>
-        <button id="generateExcelBtn" class="btn-secondary">
-          <span class="icon">📊</span>
-          Generate Excel Quote
-        </button>
-      </div>
+      <div id="mainInterface" class="dashboard-card" style="display: none;">
+        <div class="header">
+          <h2>Quote Generator</h2>
+          <button id="settingsBtn" class="btn-secondary">Settings</button>
+        </div>
 
-      <div id="quoteResult" class="result-container" style="display: none;">
-        <h3>Generated Quote</h3>
-        <div id="quoteText" class="quote-text"></div>
+        <div class="actions">
+          <button id="generateQuoteBtn" class="btn-secondary">
+            <!-- <span class="icon">📝</span> -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="icon">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" fill="currentColor" />
+              <path d="M20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                fill="currentColor" />
+            </svg>
+            <span class="text">Generate Quote</span>
+            <div class="loader"></div>
+          </button>
+          <div id="quoteGeneration" class="error-message"></div>
+
+          <button id="generateExcelBtn" class="btn-secondary">
+            <!-- <span class="icon">📊</span> -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="icon">
+              <rect x="3" y="10" width="4" height="11" fill="currentColor" />
+              <rect x="10" y="6" width="4" height="15" fill="currentColor" />
+              <rect x="17" y="3" width="4" height="18" fill="currentColor" />
+            </svg>
+            <span class="text">Generate Excel Quote</span>
+            <div class="loader"></div>
+          </button>
+        </div>
+
+        <!-- <div id="quoteResult" class="result-container" style="display: none;">
+          <h3>Generated Quote</h3>
+          <div id="quoteText" class="quote-text"></div>
+        </div> -->
       </div>
     </div>
   </div>

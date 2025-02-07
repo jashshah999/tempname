@@ -3,13 +3,7 @@
   "name": "MSME Flow Quote Generator",
   "version": "1.0",
   "description": "Generate quotes and Excel files directly from your browser",
-  "permissions": [
-    "storage",
-    "activeTab",
-    "scripting",
-    "identity",
-    "tabs"
-  ],
+  "permissions": ["storage", "activeTab", "scripting", "identity", "tabs"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": "icon.png"
@@ -17,15 +11,30 @@
   "icons": {
     "128": "icon.png"
   },
-  "content_scripts": [{
-    "matches": ["<all_urls>"],
-    "js": ["content.js"]
-  }],
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*"],
+      "js": ["content.js"]
+    }
+  ],
   "oauth2": {
     "client_id": "451604830841-n3ok3be3tb4g8cfgsss64t7mjhh2uiik.apps.googleusercontent.com",
     "scopes": ["openid", "email", "profile"]
   },
   "background": {
-        "service_worker": "background.js"
+    "service_worker": "background.js"
+  },
+  "host_permissions": ["https://mail.google.com/*", "https://api.openai.com/*"],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "lib/jspdf.umd.min.js",
+        "lib/jspdf.plugin.autotable.min.js",
+        "quotation.html",
+        "images/header.jpg",
+        "images/footer.jpg"
+      ],
+      "matches": ["https://mail.google.com/*"]
     }
+  ]
 }

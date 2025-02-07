@@ -1,10 +1,12 @@
 import base64
 import hashlib
 import json
+import mimetypes
 import os
 import urllib.parse
+from datetime import datetime
 
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
 from supabase import create_client, Client, ClientOptions
 from config import SUPABASE_URL, SUPABASE_KEY, SERVER_URL, FRONTEND_URL
 from gotrue import SyncMemoryStorage
@@ -123,18 +125,98 @@ class SupabaseOperations:
 
         return auth_response
 
+    def get_refresh_token(self, token):
+        try:
+            response = self.client.auth.get_refresh_token(token)
+            return response
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
-    def get_user_by_token(self, token: str):
-        user = self.client.auth.get_user(token)
+    def get_user(self, access_token: str):
+        try:
+            response = self.client.auth.get_user(access_token)
+            return response
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
-        if not user:
-            raise HTTPException(status_code=401, detail="Invalid token")
 
-        return user
+    def upload_file(self, bucket_name:str, file: UploadFile, user_id):
+        try:
+            file_bytes = file.file.read()
+            ext = os.path.splitext(file.filename)[1].lstrip('.').lower()
+            mime_type, _ = mimetypes.guess_type(file.filename)
+            if not mime_type:
+                if ext == "xlsx":
+                    mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                elif ext == "xls":
+                    mime_type = "application/vnd.ms-excel"
+                else:
+                    mime_type = "application/octet-stream"
+            response = self.client.storage.from_(bucket_name).upload(
+                file=file_bytes,
+                path=f"{user_id}/{file.filename}",
+                file_options={"cache-control": "3600", "upsert": "false", "content-type": mime_type},
+            )
+            return response
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
 
-    def get_refresh_token(self, refresh_token: str):
-        auth_response = self.client.auth.refresh_session(refresh_token)
-        return auth_response
+
+    def get_files(self, bucket_name:str, user_id):
+        try:
+            response = self.client.storage.from_(bucket_name).list(user_id)
+            return response
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+    def get_file(self, bucket_name:str, user_id, file_name):
+        try:
+            response = self.client.storage.from_(bucket_name).get_public_url(f"{user_id}/{file_name}")
+            return response
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+    def delete_file(self, bucket_name:str, path):
+        try:
+            response = self.client.storage.from_(bucket_name).remove(path)
+            return response
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+    def update_file(self, bucket_name:str, file: UploadFile, user_id):
+        try:
+            response = self.client.storage.from_(bucket_name).update(
+                path=f"{user_id}/{file.filename}",
+                file=file.read(),
+                file_options={"cache-control": "3600", "upsert": "true"},
+            )
+            return response
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+    def save_quotation(self, user_id, file_paths: list[str]):
+        try:
+            data = [{"user_id": user_id, "quotation_file_path": path} for path in file_paths]
+            response = self.client.table("quotations_uploads").insert(data)
+            return response
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+    def save_price_list(self, user_id, file_paths: list[str]):
+        try:
+            data = [{"user_id": user_id, "path": path} for path in file_paths]
+            response = self.client.table("price_list_path").insert(data)
+            return response
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+
 
 
 

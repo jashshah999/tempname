@@ -37,10 +37,46 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         const result = await response.json();
 
         chrome.storage.local.set(
-          { session: result["session"] },
+          {
+            session: result["session"],
+            access_token: result["access_token"],
+            refresh_token: result["refresh_token"],
+          },
           function () {}
         );
       }
     }
   }
 });
+
+setInterval(async () => {
+  const { access_token, refresh_token } = await new Promise((resolve) => {
+    chrome.storage.local.get(["access_token", "refresh_token"], (result) => {
+      resolve(result);
+    });
+  });
+
+  if (access_token && refresh_token) {
+    const response = await fetch(
+      `${BACKEND_URL}/api/authentication/refresh-token`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refresh_token: refresh_token }),
+      }
+    );
+
+    const result = await response.json();
+
+    chrome.storage.local.set(
+      {
+        access_token: result["access_token"],
+        refresh_token: result["refresh_token"],
+        session: result["session"],
+      },
+      function () {}
+    );
+  }
+}, 3600000);

@@ -41,3 +41,18 @@ async def verify_user(data : VerifyUserModel):
     except Exception as e:
         print("Error in Verify User : ", e)
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/get-refresh-token")
+async def get_refresh_token():
+    """
+    Get refresh token
+    """
+    try:
+        refresh_token = db_client.get_refresh_token()
+        session = refresh_token.session
+        access_token = session.access_token
+        refresh_token = session.refresh_token
+        response_session = json.loads(session.model_dump_json())
+        return JSONResponse(content={ "access_token": access_token, "refresh_token": refresh_token, "session" : response_session})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
