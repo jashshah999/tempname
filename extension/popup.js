@@ -1087,38 +1087,39 @@ generateQuoteBtn.addEventListener("click", async () => {
 // Generate Excel button handler
 generateExcelBtn.addEventListener("click", async () => {
   // Get the current active tab
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  window.open("http://localhost:5173", "_blank");
+  // const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-  // Create sample Excel data
-  const excelData = [
-    ["Item", "Description", "Quantity", "Unit Price", "Total"],
-    ["Product A", "High-quality widget", "2", "100", "200"],
-    ["Product B", "Premium gadget", "3", "150", "450"],
-    ["Product C", "Deluxe item", "1", "200", "200"],
-    ["", "", "", "Subtotal", "850"],
-    ["", "", "", "Tax (18%)", "153"],
-    ["", "", "", "Total", "1003"],
-  ].map((row) =>
-    row.map((cell) => ({
-      value: cell.toString(),
-      width: 120,
-    }))
-  );
+  // // Create sample Excel data
+  // const excelData = [
+  //   ["Item", "Description", "Quantity", "Unit Price", "Total"],
+  //   ["Product A", "High-quality widget", "2", "100", "200"],
+  //   ["Product B", "Premium gadget", "3", "150", "450"],
+  //   ["Product C", "Deluxe item", "1", "200", "200"],
+  //   ["", "", "", "Subtotal", "850"],
+  //   ["", "", "", "Tax (18%)", "153"],
+  //   ["", "", "", "Total", "1003"],
+  // ].map((row) =>
+  //   row.map((cell) => ({
+  //     value: cell.toString(),
+  //     width: 120,
+  //   }))
+  // );
 
-  // Inject the content script
-  await chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    files: ["content.js"],
-  });
+  // // Inject the content script
+  // await chrome.scripting.executeScript({
+  //   target: { tabId: tab.id },
+  //   files: ["content.js"],
+  // });
 
-  // Send the Excel data to the content script
-  chrome.tabs.sendMessage(tab.id, {
-    type: "SHOW_EXCEL_EDITOR",
-    data: excelData,
-  });
+  // // Send the Excel data to the content script
+  // chrome.tabs.sendMessage(tab.id, {
+  //   type: "SHOW_EXCEL_EDITOR",
+  //   data: excelData,
+  // });
 
-  // Close the popup
-  window.close();
+  // // Close the popup
+  // window.close();
 });
 
 function showMainContent(flag = 0) {
