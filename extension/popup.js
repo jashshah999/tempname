@@ -30,12 +30,13 @@ const priceListpriceListFileInput = document.getElementById("priceListFile");
 const priceListuploadPriceListContainer = document.getElementById("priceList");
 const priceListInput = document.getElementById("priceListUpload");
 const quoteGeneration = document.getElementById("quoteGeneration");
+const quotePdfGeneration = document.getElementById("quotePdfGeneration");
 
 function extractProductsAndCompany(data) {
   let products = [];
   let companyName = "";
   try {
-    const content = data.choices[0].message.content;
+    const content = data.quotation;
     const parsedData = JSON.parse(
       content.replace(/```json\n?|\n?```/g, "").trim()
     );
@@ -72,6 +73,197 @@ function extractProductsAndCompany(data) {
     companyName = "";
   }
   return { products, companyName };
+}
+
+function formatEmailReply(reply) {
+  // Split the reply into lines
+  const lines = reply.split("\n");
+
+  // Process each line
+  const formattedLines = lines.map((line) => {
+    // Add extra spacing after product sections
+    if (line.trim().startsWith("Delivery Time:")) {
+      return line + "<br><br>";
+    }
+    // Add spacing after the greeting
+    if (line.includes("sir") || line.includes("madam")) {
+      return line + "<br><br>";
+    }
+    // Add spacing after "We are pleased to quote the following:"
+    if (line.includes("pleased to quote")) {
+      return line + "<br><br>";
+    }
+    // Keep other lines as is
+    return line;
+  });
+
+  // Join the lines back together with proper HTML line breaks
+  let formattedReply = formattedLines.join("<br>");
+
+  // Ensure proper spacing between products
+  formattedReply = formattedReply.replace(/(<br>){3,}/g, "<br><br>"); // Remove excessive line breaks
+
+  // Add extra spacing before the closing line
+  formattedReply = formattedReply.replace(
+    /(Looking forward to your response\.)/,
+    "<br>$1"
+  );
+
+  return formattedReply;
+}
+
+async function generateAndInsertReply(backend_url) {
+  // Helper function defined inside generateAndInsertReply so it's available in the webpage context
+  function formatEmailReply(reply) {
+    // Split the reply into lines
+    const lines = reply.split("\n");
+
+    // Process each line
+    const formattedLines = lines.map((line) => {
+      // Add extra spacing after product sections
+      if (line.trim().startsWith("Delivery Time:")) {
+        return line + "<br><br>";
+      }
+      // Add spacing after the greeting
+      if (line.includes("sir") || line.includes("madam")) {
+        return line + "<br><br>";
+      }
+      // Add spacing after "We are pleased to quote the following:"
+      if (line.includes("pleased to quote")) {
+        return line + "<br><br>";
+      }
+      // Keep other lines as is
+      return line;
+    });
+
+    // Join the lines back together with proper HTML line breaks
+    let formattedReply = formattedLines.join("<br>");
+
+    // Ensure proper spacing between products
+    formattedReply = formattedReply.replace(/(<br>){3,}/g, "<br><br>"); // Remove excessive line breaks
+
+    // Add extra spacing before the closing line
+    formattedReply = formattedReply.replace(
+      /(Looking forward to your response\.)/,
+      "<br>$1"
+    );
+
+    return formattedReply;
+  }
+
+  try {
+    const emailContainers = document.querySelectorAll(".gs");
+    console.log("Found email containers:", emailContainers.length);
+
+    if (emailContainers.length === 0) {
+      return {
+        error:
+          "No email content found. Please make sure you have an email open.",
+      };
+    }
+
+    let emailContent = "";
+    emailContainers.forEach((container) => {
+      emailContent += container.innerText + "\n";
+    });
+    console.log(
+      "Email content extracted:",
+      emailContent.substring(0, 100) + "..."
+    );
+
+    if (!emailContent.trim()) {
+      return { error: "Email content appears to be empty." };
+    }
+
+    // Find and click reply button
+    const replyButtons = document.querySelectorAll('[role="button"]');
+    console.log("Found buttons:", replyButtons.length);
+
+    let replyButton;
+    for (const button of replyButtons) {
+      if (button.getAttribute("aria-label")?.toLowerCase().includes("reply")) {
+        replyButton = button;
+        break;
+      }
+    }
+
+    if (!replyButton) {
+      return { error: "Reply button not found." };
+    }
+
+    console.log("Found reply button, clicking it");
+    replyButton.click();
+
+    try {
+      console.log("Making API call to OpenAI");
+      const { access_token } = await new Promise((resolve) => {
+        chrome.storage.local.get(["access_token"], (result) => {
+          resolve(result);
+        });
+      });
+
+      const response = await fetch(
+        `${backend_url}/api/quotation/generate-quotation-text`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email_content: emailContent,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("API Error:", errorText);
+        return { error: `API Error: ${response.status} - ${errorText}` };
+      }
+
+      const data = await response.json();
+      console.log("API response received:", data);
+      const generatedReply = data.quotation;
+
+      // Format the reply with proper spacing and structure
+      const formattedReply = formatEmailReply(generatedReply);
+      console.log("Formatted reply:", formattedReply);
+
+      // More reliable way to find and insert into reply box
+      return new Promise((resolve) => {
+        let attempts = 0;
+        const maxAttempts = 20;
+
+        const insertReplyText = () => {
+          const messageBody = document.querySelector('[role="textbox"]');
+          console.log("Attempt", attempts + 1, "to find textbox");
+
+          if (messageBody) {
+            console.log("Found textbox, inserting reply");
+            messageBody.innerHTML = formattedReply;
+            messageBody.dispatchEvent(new Event("input", { bubbles: true }));
+            resolve({ success: true });
+          } else if (attempts < maxAttempts) {
+            attempts++;
+            setTimeout(insertReplyText, 500);
+          } else {
+            resolve({
+              error: "Could not find reply textbox after multiple attempts.",
+            });
+          }
+        };
+
+        setTimeout(insertReplyText, 1000);
+      });
+    } catch (error) {
+      console.error("API or insertion error:", error);
+      return { error: "API Error: " + error.message };
+    }
+  } catch (error) {
+    console.error("General error:", error);
+    return { error: "Error: " + error.message };
+  }
 }
 
 // Check if user is already logged in
@@ -135,10 +327,35 @@ settingsBtn.addEventListener("click", () => {
   chrome.tabs.create({ url: `${APP_URL}/dashboard` });
 });
 
-// Generate Quote button handler
 generateQuoteBtn.addEventListener("click", async () => {
   try {
     generateQuoteBtn.classList.add("processing");
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
+
+    const result = await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      args: [BACKEND_URL],
+      function: generateAndInsertReply,
+    });
+
+    if (result[0].result && result[0].result.error) {
+      generateQuoteBtn.classList.remove("processing");
+      quoteGeneration.textContent = result[0].result.error;
+    }
+    generateQuoteBtn.classList.remove("processing");
+  } catch (error) {
+    generateQuoteBtn.classList.remove("processing");
+    quoteGeneration.textContent = error.message;
+  }
+});
+
+// Generate Quote button handler
+generateExcelBtn.addEventListener("click", async () => {
+  try {
+    generateExcelBtn.classList.add("processing");
 
     const [tab] = await chrome.tabs.query({
       active: true,
@@ -173,8 +390,8 @@ generateQuoteBtn.addEventListener("click", async () => {
 
           return { emailText };
         } catch (error) {
-          generateQuoteBtn.classList.remove("processing");
-          quoteGeneration.textContent = error.message;
+          generateExcelBtn.classList.remove("processing");
+          quotePdfGeneration.textContent = error.message;
         }
       },
       args: [],
@@ -187,7 +404,7 @@ generateQuoteBtn.addEventListener("click", async () => {
     });
 
     const response = await fetch(
-      `${BACKEND_URL}/api/quotation/generate-quotation`,
+      `${BACKEND_URL}/api/quotation/generate-quotation-pdf`,
       {
         method: "POST",
         headers: {
@@ -221,14 +438,14 @@ generateQuoteBtn.addEventListener("click", async () => {
     };
 
     if (productsResult.error) {
-      generateQuoteBtn.classList.remove("processing");
-      quoteGeneration.textContent = productsResult.error;
+      generateExcelBtn.classList.remove("processing");
+      quotePdfGeneration.textContent = productsResult.error;
       return;
     }
 
     if (!productsResult) {
-      generateQuoteBtn.classList.remove("processing");
-      quoteGeneration.textContent = `Failed to extract product information from the email.`;
+      generateExcelBtn.classList.remove("processing");
+      quotePdfGeneration.textContent = `Failed to extract product information from the email.`;
       return;
     }
 
@@ -1079,48 +1296,48 @@ generateQuoteBtn.addEventListener("click", async () => {
       clearInterval(checkResult);
     }, 30000);
   } catch (error) {
-    generateQuoteBtn.classList.remove("processing");
-    quoteGeneration.textContent = error.message;
+    generateExcelBtn.classList.remove("processing");
+    quotePdfGeneration.textContent = error.message;
   }
 });
 
 // Generate Excel button handler
-generateExcelBtn.addEventListener("click", async () => {
-  // Get the current active tab
-  window.open("http://localhost:5173", "_blank");
-  // const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+// generateExcelBtn.addEventListener("click", async () => {
+//   // Get the current active tab
+//   window.open("http://localhost:5173", "_blank");
+//   // const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-  // // Create sample Excel data
-  // const excelData = [
-  //   ["Item", "Description", "Quantity", "Unit Price", "Total"],
-  //   ["Product A", "High-quality widget", "2", "100", "200"],
-  //   ["Product B", "Premium gadget", "3", "150", "450"],
-  //   ["Product C", "Deluxe item", "1", "200", "200"],
-  //   ["", "", "", "Subtotal", "850"],
-  //   ["", "", "", "Tax (18%)", "153"],
-  //   ["", "", "", "Total", "1003"],
-  // ].map((row) =>
-  //   row.map((cell) => ({
-  //     value: cell.toString(),
-  //     width: 120,
-  //   }))
-  // );
+//   // // Create sample Excel data
+//   // const excelData = [
+//   //   ["Item", "Description", "Quantity", "Unit Price", "Total"],
+//   //   ["Product A", "High-quality widget", "2", "100", "200"],
+//   //   ["Product B", "Premium gadget", "3", "150", "450"],
+//   //   ["Product C", "Deluxe item", "1", "200", "200"],
+//   //   ["", "", "", "Subtotal", "850"],
+//   //   ["", "", "", "Tax (18%)", "153"],
+//   //   ["", "", "", "Total", "1003"],
+//   // ].map((row) =>
+//   //   row.map((cell) => ({
+//   //     value: cell.toString(),
+//   //     width: 120,
+//   //   }))
+//   // );
 
-  // // Inject the content script
-  // await chrome.scripting.executeScript({
-  //   target: { tabId: tab.id },
-  //   files: ["content.js"],
-  // });
+//   // // Inject the content script
+//   // await chrome.scripting.executeScript({
+//   //   target: { tabId: tab.id },
+//   //   files: ["content.js"],
+//   // });
 
-  // // Send the Excel data to the content script
-  // chrome.tabs.sendMessage(tab.id, {
-  //   type: "SHOW_EXCEL_EDITOR",
-  //   data: excelData,
-  // });
+//   // // Send the Excel data to the content script
+//   // chrome.tabs.sendMessage(tab.id, {
+//   //   type: "SHOW_EXCEL_EDITOR",
+//   //   data: excelData,
+//   // });
 
-  // // Close the popup
-  // window.close();
-});
+//   // // Close the popup
+//   // window.close();
+// });
 
 function showMainContent(flag = 0) {
   authBlock.style.display = "none";
