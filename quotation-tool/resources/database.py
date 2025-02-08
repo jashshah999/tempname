@@ -140,7 +140,7 @@ class SupabaseOperations:
             raise HTTPException(status_code=500, detail=str(e))
 
 
-    def upload_file(self, bucket_name:str, file: UploadFile, user_id):
+    def upload_file(self, bucket_name:str, file: UploadFile, path):
         try:
             file_bytes = file.file.read()
             ext = os.path.splitext(file.filename)[1].lstrip('.').lower()
@@ -154,7 +154,7 @@ class SupabaseOperations:
                     mime_type = "application/octet-stream"
             response = self.client.storage.from_(bucket_name).upload(
                 file=file_bytes,
-                path=f"{user_id}/{file.filename}",
+                path=path,
                 file_options={"cache-control": "3600", "upsert": "false", "content-type": mime_type},
             )
             return response

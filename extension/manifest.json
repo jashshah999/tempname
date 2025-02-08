@@ -34,7 +34,7 @@
         "images/header.jpg",
         "images/footer.jpg"
       ],
-      "matches": ["https://mail.google.com/*"]
+      "matches": ["<all_urls>"]
     }
   ]
 }

@@ -37,6 +37,8 @@ function extractProductsAndCompany(data) {
   let companyName = "";
   try {
     const content = data.quotation;
+
+    console.log("Parsing data:", content);
     const parsedData = JSON.parse(
       content.replace(/```json\n?|\n?```/g, "").trim()
     );
@@ -153,19 +155,46 @@ async function generateAndInsertReply(backend_url) {
 
   try {
     const emailContainers = document.querySelectorAll(".gs");
+    const outlookEmailContainers = document.querySelectorAll(".aVla3");
+
     console.log("Found email containers:", emailContainers.length);
 
-    if (emailContainers.length === 0) {
+    if (emailContainers.length === 0 && outlookEmailContainers.length === 0) {
       return {
-        error:
-          "No email content found. Please make sure you have an email open.",
+        error: `No email content found. Please make sure you have an email open.`,
       };
     }
 
+    let type = 1;
+
+    if (emailContainers.length > 0) {
+      type = 1;
+    } else if (outlookEmailContainers.length > 0) {
+      type = 2;
+    }
+
     let emailContent = "";
-    emailContainers.forEach((container) => {
-      emailContent += container.innerText + "\n";
-    });
+    const replyButtons = document.querySelectorAll('[role="button"]');
+    console.log("Found buttons:", replyButtons.length);
+    let replyButton;
+
+    if (type === 1) {
+      emailContainers.forEach((container) => {
+        emailContent += container.innerText + "\n";
+      });
+    } else if (type === 2) {
+      outlookEmailContainers.forEach((container) => {
+        emailContent += container.innerText + "\n";
+      });
+    }
+
+    for (const button of replyButtons) {
+      if (button.getAttribute("aria-label")?.toLowerCase().includes("reply")) {
+        replyButton = button;
+        break;
+      }
+    }
+
     console.log(
       "Email content extracted:",
       emailContent.substring(0, 100) + "..."
@@ -175,20 +204,8 @@ async function generateAndInsertReply(backend_url) {
       return { error: "Email content appears to be empty." };
     }
 
-    // Find and click reply button
-    const replyButtons = document.querySelectorAll('[role="button"]');
-    console.log("Found buttons:", replyButtons.length);
-
-    let replyButton;
-    for (const button of replyButtons) {
-      if (button.getAttribute("aria-label")?.toLowerCase().includes("reply")) {
-        replyButton = button;
-        break;
-      }
-    }
-
     if (!replyButton) {
-      return { error: "Reply button not found." };
+      return { error: `Reply button not found: ${replyButtons.length}` };
     }
 
     console.log("Found reply button, clicking it");
@@ -330,6 +347,7 @@ settingsBtn.addEventListener("click", () => {
 generateQuoteBtn.addEventListener("click", async () => {
   try {
     generateQuoteBtn.classList.add("processing");
+    quoteGeneration.textContent = "";
     const [tab] = await chrome.tabs.query({
       active: true,
       currentWindow: true,
@@ -355,6 +373,7 @@ generateQuoteBtn.addEventListener("click", async () => {
 // Generate Quote button handler
 generateExcelBtn.addEventListener("click", async () => {
   try {
+    quotePdfGeneration.textContent = "";
     generateExcelBtn.classList.add("processing");
 
     const [tab] = await chrome.tabs.query({
@@ -363,24 +382,48 @@ generateExcelBtn.addEventListener("click", async () => {
     });
     let emailContent = "";
 
-    const emailText = await chrome.scripting.executeScript({
+    const emailTextResult = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: async () => {
         try {
           const emailContainers = document.querySelectorAll(".gs");
-          console.log("Found email containers:", emailContainers.length);
+          const outlookEmailContainers = document.querySelectorAll(".aVla3");
+          console.log(
+            "Found email containers:",
+            emailContainers.length,
+            outlookEmailContainers.length
+          );
 
-          if (emailContainers.length === 0) {
+          if (
+            emailContainers.length === 0 &&
+            outlookEmailContainers.length === 0
+          ) {
             return {
               error:
                 "No email content found. Please make sure you have an email open.",
             };
           }
 
+          let type = 1;
+
+          if (emailContainers.length > 0) {
+            type = 1;
+          } else if (outlookEmailContainers.length > 0) {
+            type = 2;
+          }
+
           let emailText = "";
-          emailContainers.forEach((container) => {
-            emailText += container.innerText + "\n";
-          });
+
+          let replyButton;
+          if (type === 1) {
+            emailContainers.forEach((container) => {
+              emailText += container.innerText + "\n";
+            });
+          } else if (type === 2) {
+            outlookEmailContainers.forEach((container) => {
+              emailText += container.innerText + "\n";
+            });
+          }
 
           console.log("Email content:", emailText.substring(0, 100) + "...");
 
@@ -388,7 +431,7 @@ generateExcelBtn.addEventListener("click", async () => {
             return { error: "Email content appears to be empty." };
           }
 
-          return { emailText };
+          return { emailText, type };
         } catch (error) {
           generateExcelBtn.classList.remove("processing");
           quotePdfGeneration.textContent = error.message;
@@ -396,6 +439,8 @@ generateExcelBtn.addEventListener("click", async () => {
       },
       args: [],
     });
+
+    const { emailText, type } = emailTextResult[0].result;
 
     const { access_token } = await new Promise((resolve) => {
       chrome.storage.local.get(["access_token"], (result) => {
@@ -412,7 +457,7 @@ generateExcelBtn.addEventListener("click", async () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email_content: emailText[0].result.emailText,
+          email_content: emailText,
         }),
       }
     );
@@ -479,7 +524,8 @@ generateExcelBtn.addEventListener("click", async () => {
         companyName,
         headerUrl,
         footerUrl,
-        emailContent
+        emailContent,
+        type
       ) => {
         try {
           // Create a global variable to store the callback
@@ -1078,6 +1124,60 @@ generateExcelBtn.addEventListener("click", async () => {
               newDoc.text(`To: ${companyInput.value}`, 20, 55);
 
               // Update table position with maxY limit to leave space for terms
+              // newDoc.autoTable({
+              //   startY: 65,
+              //   head: [
+              //     [
+              //       "Sr No",
+              //       "Description",
+              //       "Make",
+              //       "Code",
+              //       "Range",
+              //       "Rate",
+              //       "Remark",
+              //     ],
+              //   ],
+              //   body: tableData.map((p) => [
+              //     p.srNo,
+              //     p.description,
+              //     p.make,
+              //     p.code,
+              //     p.range,
+              //     p.rate,
+              //     p.remark,
+              //   ]),
+              //   styles: {
+              //     fontSize: 10,
+              //     cellPadding: 5,
+              //     lineColor: [0, 0, 0],
+              //     lineWidth: 0.1,
+              //   },
+              //   headStyles: {
+              //     fillColor: [255, 255, 255],
+              //     textColor: [0, 0, 0],
+              //     fontStyle: "bold",
+              //     halign: "center",
+              //   },
+              //   bodyStyles: {
+              //     halign: "center",
+              //   },
+              //   columnStyles: {
+              //     0: { cellWidth: 15 }, // Sr No
+              //     1: { cellWidth: 45 }, // Description
+              //     2: { cellWidth: 25 }, // Make
+              //     3: { cellWidth: 20 }, // Code
+              //     4: { cellWidth: 25 }, // Range
+              //     5: { cellWidth: 20 }, // Rate
+              //     6: { cellWidth: 30 }, // Remark
+              //   },
+              //   theme: "grid",
+              //   // Add margin at bottom to ensure space for terms
+              //   margin: { bottom: 60 },
+              // });
+              // Calculate available width (A4 width = 210mm, with margins)
+              const pageWidth = newDoc.internal.pageSize.width;
+              const margins = { left: 15, right: 15 }; // Reduced margins to 15mm each
+              // Configure table with adjusted column widths
               newDoc.autoTable({
                 startY: 65,
                 head: [
@@ -1092,41 +1192,66 @@ generateExcelBtn.addEventListener("click", async () => {
                   ],
                 ],
                 body: tableData.map((p) => [
-                  p.srNo,
-                  p.description,
-                  p.make,
-                  p.code,
-                  p.range,
-                  p.rate,
-                  p.remark,
+                  p.srNo || "",
+                  p.description || "",
+                  p.make || "",
+                  p.code || "",
+                  p.range || "",
+                  p.rate || "",
+                  p.remark || "",
                 ]),
                 styles: {
-                  fontSize: 10,
-                  cellPadding: 5,
+                  fontSize: 9, // Slightly reduced font size
+                  cellPadding: 3, // Reduced padding
                   lineColor: [0, 0, 0],
                   lineWidth: 0.1,
+                  overflow: "linebreak",
+                  cellWidth: "wrap",
+                  font: "helvetica", // Using a space-efficient font
                 },
                 headStyles: {
                   fillColor: [255, 255, 255],
                   textColor: [0, 0, 0],
                   fontStyle: "bold",
                   halign: "center",
+                  valign: "middle",
+                  fontSize: 9,
                 },
                 bodyStyles: {
                   halign: "center",
+                  valign: "middle",
                 },
                 columnStyles: {
-                  0: { cellWidth: 15 }, // Sr No
-                  1: { cellWidth: 45 }, // Description
+                  0: { cellWidth: 12 }, // Sr No (reduced)
+                  1: { cellWidth: 50 }, // Description (increased for more text)
                   2: { cellWidth: 25 }, // Make
                   3: { cellWidth: 20 }, // Code
                   4: { cellWidth: 25 }, // Range
                   5: { cellWidth: 20 }, // Rate
-                  6: { cellWidth: 30 }, // Remark
+                  6: { cellWidth: 28 }, // Remark
                 },
                 theme: "grid",
-                // Add margin at bottom to ensure space for terms
-                margin: { bottom: 60 },
+                margin: margins,
+                didDrawPage: function (data) {
+                  // Ensure header image is added on each new page
+                  if (data.pageCount > 1) {
+                    newDoc.addPage();
+                    // Re-add header image if needed
+                    newDoc.addImage(headerBase64, "JPEG", 0, 0, 210, 39);
+                  }
+                },
+                willDrawCell: function (data) {
+                  // Adjust cell height if content is too long
+                  if (data.cell.text.join("").length > 50) {
+                    data.cell.styles.minCellHeight = 20;
+                  }
+                },
+                didDrawCell: function (data) {
+                  // Handle any cell drawing errors
+                  if (data.cell.error) {
+                    console.warn("Cell drawing error:", data.cell.error);
+                  }
+                },
               });
 
               // Get final Y position after table
@@ -1215,10 +1340,28 @@ generateExcelBtn.addEventListener("click", async () => {
 
                 await new Promise((resolve) => setTimeout(resolve, 1000));
 
-                const attachmentInput = document.querySelector(
-                  'input[type="file"][name="Filedata"]'
-                );
-                if (attachmentInput) {
+                if (type === 1) {
+                  const attachmentInput = document.querySelector(
+                    'input[type="file"][name="Filedata"]'
+                  );
+                  if (attachmentInput) {
+                    const file = new File(
+                      [newDoc.output("blob")],
+                      `quotation_${companyInput.value
+                        .trim()
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]/g, "_")
+                        .replace(/_+/g, "_")
+                        .replace(/^_|_$/g, "")}.pdf`
+                    );
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    attachmentInput.files = dataTransfer.files;
+                    attachmentInput.dispatchEvent(
+                      new Event("change", { bubbles: true })
+                    );
+                  }
+                } else if (type === 2) {
                   const file = new File(
                     [newDoc.output("blob")],
                     `quotation_${companyInput.value
@@ -1230,10 +1373,18 @@ generateExcelBtn.addEventListener("click", async () => {
                   );
                   const dataTransfer = new DataTransfer();
                   dataTransfer.items.add(file);
-                  attachmentInput.files = dataTransfer.files;
-                  attachmentInput.dispatchEvent(
-                    new Event("change", { bubbles: true })
-                  );
+
+                  const pasteEvent = new ClipboardEvent("paste", {
+                    bubbles: true,
+                    cancelable: true,
+                    clipboardData: dataTransfer,
+                  });
+
+                  // Focus the composer before pasting
+                  composeArea.focus();
+
+                  // Dispatch paste event
+                  composeArea.dispatchEvent(pasteEvent);
                 }
               }
 
@@ -1258,7 +1409,7 @@ generateExcelBtn.addEventListener("click", async () => {
           return { error: error.message };
         }
       },
-      args: [products, companyName, headerUrl, footerUrl, emailContent],
+      args: [products, companyName, headerUrl, footerUrl, emailContent, type],
     });
 
     // Keep checking the result
@@ -1277,17 +1428,17 @@ generateExcelBtn.addEventListener("click", async () => {
           // Process is complete
           clearInterval(checkResult);
           if (result[0].result && result[0].result.error) {
-            showError(result[0].result.error);
+            generateExcelBtn.classList.remove("processing");
+            quotePdfGeneration.textContent = result[0].result.error;
           } else {
             showStatus("Quote generated successfully!", "success");
+            generateExcelBtn.classList.remove("processing");
           }
-          setButtonsLoading(false);
         }
       } catch (error) {
         clearInterval(checkResult);
-        console.error("Error checking result:", error);
-        showError(error.message);
-        setButtonsLoading(false);
+        generateExcelBtn.classList.remove("processing");
+        quotePdfGeneration.textContent = error.message;
       }
     }, 1000);
 

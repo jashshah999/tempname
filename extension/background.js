@@ -36,14 +36,15 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
         const result = await response.json();
 
-        chrome.storage.local.set(
-          {
-            session: result["session"],
-            access_token: result["access_token"],
-            refresh_token: result["refresh_token"],
-          },
-          function () {}
-        );
+        let obj = {
+          session: result["session"],
+          access_token: result["access_token"],
+          refresh_token: result["refresh_token"],
+        };
+        if (!result["is_new_user"]) {
+          obj.flag = 2;
+        }
+        chrome.storage.local.set(obj, function () {});
       }
     }
   }
@@ -70,13 +71,14 @@ setInterval(async () => {
 
     const result = await response.json();
 
-    chrome.storage.local.set(
-      {
-        access_token: result["access_token"],
-        refresh_token: result["refresh_token"],
-        session: result["session"],
-      },
-      function () {}
-    );
+    let obj = {
+      session: result["session"],
+      access_token: result["access_token"],
+      refresh_token: result["refresh_token"],
+    };
+    if (!result["is_new_user"]) {
+      obj.flag = 2;
+    }
+    chrome.storage.local.set(obj, function () {});
   }
 }, 3600000);

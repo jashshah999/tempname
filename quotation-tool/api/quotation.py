@@ -6,7 +6,7 @@ from starlette.responses import JSONResponse
 
 from middleware.auth_middleware import verify_user
 from resources.custom_openai import GPTProcessor
-from constants.prompts import GENERATE_QUOTATION
+from constants.prompts import GENERATE_QUOTATION, GENERATE_PDF_QUOTATION
 
 # Create the auth router
 router = APIRouter(
@@ -49,8 +49,8 @@ async def generate_quotation_pdf(request : Request, data: GenerateQuotationInput
             {data.email_content}
         """
 
-        gpt_response = gpt_processor.process_text(input_text=user_prompt, prompt=GENERATE_QUOTATION)
-
+        gpt_response = gpt_processor.process_text(input_text=user_prompt, prompt=GENERATE_PDF_QUOTATION)
+        print(gpt_response)
         return JSONResponse(status_code=200, content={"quotation": gpt_response})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -37,7 +37,9 @@ async def verify_user(data : VerifyUserModel):
         access_token = session.access_token
         refresh_token = session.refresh_token
         response_session = json.loads(session.model_dump_json())
-        return JSONResponse(content={ "access_token": access_token, "refresh_token": refresh_token, "session" : response_session})
+        is_new_user = session.user.created_at == session.user.last_sign_in_at
+        print(is_new_user, session.user.created_at, session.user.last_sign_in_at)
+        return JSONResponse(content={ "access_token": access_token, "refresh_token": refresh_token, "session" : response_session, "is_new_user": is_new_user})
     except Exception as e:
         print("Error in Verify User : ", e)
         raise HTTPException(status_code=500, detail=str(e))
@@ -53,6 +55,8 @@ async def get_refresh_token():
         access_token = session.access_token
         refresh_token = session.refresh_token
         response_session = json.loads(session.model_dump_json())
-        return JSONResponse(content={ "access_token": access_token, "refresh_token": refresh_token, "session" : response_session})
+        is_new_user = session.user.created_at == session.user.last_sign_in_at
+        print(is_new_user, session.user.created_at, session.user.last_sign_in_at)
+        return JSONResponse(content={ "access_token": access_token, "refresh_token": refresh_token, "session" : response_session, "is_new_user": is_new_user})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

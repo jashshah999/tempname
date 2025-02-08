@@ -103,7 +103,7 @@ async def upload_quotation(request: Request, quotations: list[UploadFile] = File
     try:
         uploaded_quotation = []
         for file in quotations:
-            response = db_client.upload_file("excel-files", file, request.state.user_id)
+            response = db_client.upload_file("excel-files", file, f"{request.state.user_id}/quotation/{file.filename}")
             uploaded_quotation.append(response)
 
 
@@ -118,7 +118,7 @@ async def update_price_list_files(request: Request, price_list_files: list[Uploa
     try:
         uploaded_files = []
         for file in price_list_files:
-            response = db_client.upload_file("excel-files", file, request.state.user_id)
+            response = db_client.upload_file("excel-files", file, f"{request.state.user_id}/price-list/{file.filename}")
             uploaded_files.append(response)
 
         return JSONResponse(content={"message": "Price list files uploaded successfully"})
