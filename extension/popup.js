@@ -1642,8 +1642,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Next button click simulates file upload processing.
   nextButton.addEventListener("click", () => {
+    priceListUpload.classList.add("processing");
     if (priceListFileInput.files.length === 0) {
       priceListErrorMsg.textContent = "Please select at least one file.";
+      priceListUpload.classList.remove("processing");
       return;
     }
 
@@ -1665,6 +1667,7 @@ document.addEventListener("DOMContentLoaded", function () {
           .then((data) => {
             if (data.error || data.detail) {
               priceListErrorMsg.textContent = data.error;
+              priceListUpload.classList.remove("processing");
               return;
             }
             chrome.storage.local.set(
@@ -1674,17 +1677,22 @@ document.addEventListener("DOMContentLoaded", function () {
               function () {}
             );
             showquotationUpload();
+            priceListUpload.classList.remove("processing");
           })
           .catch((error) => {
             priceListErrorMsg.textContent = `Upload failed: ${error.message}`;
+            priceListUpload.classList.remove("processing");
           });
       }
     });
   });
 
   submitButton.addEventListener("click", () => {
+    quotationUpload.classList.add("processing");
+
     if (quotationFileInput.files.length === 0) {
       quotationErrorMsg.textContent = "Please select at least one file.";
+      quotationUpload.classList.remove("processing");
       return;
     }
 
@@ -1706,6 +1714,7 @@ document.addEventListener("DOMContentLoaded", function () {
           .then((data) => {
             if (data.error || data.detail) {
               quotationErrorMsg.textContent = data.error;
+              quotationUpload.classList.remove("processing");
               return;
             }
             chrome.storage.local.set(
@@ -1715,9 +1724,11 @@ document.addEventListener("DOMContentLoaded", function () {
               function () {}
             );
             showMainInterface();
+            quotationUpload.classList.remove("processing");
           })
           .catch((error) => {
             quotationErrorMsg.textContent = `Upload failed: ${error.message}`;
+            quotationUpload.classList.remove("processing");
           });
       }
     });

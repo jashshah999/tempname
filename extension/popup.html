@@ -69,7 +69,10 @@
           <input type="file" id="priceListInput" accept=".xls,.xlsx" multiple style="display: none;" />
         </div>
         <div class="actions mt-2">
-          <button id="uploadPriceList" class="btn-secondary">Next</button>
+          <button id="uploadPriceList" class="btn-secondary">
+            <span class="text">Next</span>
+            <div class="loader"></div>
+          </button>
         </div>
         <div id="priceListUploadError" class="error-message"></div>
       </div>
@@ -87,7 +90,10 @@
           <input type="file" id="quotationInput" accept=".xls,.xlsx" multiple style="display: none;" />
         </div>
         <div class="actions mt-2">
-          <button id="uploadQuotation" class="btn-secondary">Submit</button>
+          <button id="uploadQuotation" class="btn-secondary">
+            <span class="text">Submit</span>
+            <div class="loader"></div>
+          </button>
         </div>
         <div id="quotationUploadError" class="error-message"></div>
       </div>
